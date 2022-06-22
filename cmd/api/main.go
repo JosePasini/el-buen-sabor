@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/app"
@@ -13,11 +12,11 @@ func main() {
 	fmt.Println("Hello World")
 	router := gin.Default()
 
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World",
-		})
-	})
+	// router.GET("/", func(c *gin.Context) {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"message": "Hello World",
+	// 	})
+	// })
 
 	fmt.Println("Iniciando la app...")
 	server, err := app.NewApp()
