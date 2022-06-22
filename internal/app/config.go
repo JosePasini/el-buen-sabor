@@ -35,10 +35,10 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 
 	return instrumentos.AppConfig{
 		DB: database.MySQLConfig{
-			User:     USER_ENV,
-			Password: PASS_ENV,
-			Host:     HOST_ENV,
-			Database: NAME_ENV,
+			User:     "baac4c3d3bb29e",
+			Password: "408399dd",
+			Host:     "us-cdbr-east-05.cleardb.net",
+			Database: "heroku_9952cf2f0b46460",
 		},
 	}, nil
 }
