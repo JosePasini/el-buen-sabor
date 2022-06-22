@@ -1,8 +1,6 @@
 package app
 
 import (
-	"net/http"
-
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos"
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/controllers"
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/database"
@@ -50,11 +48,11 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
 	}))
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World",
-		})
-	})
+	// router.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(http.StatusOK, gin.H{
+	// 		"message": "Hello World",
+	// 	})
+	// })
 
 	instrumentoGroup := router.Group("/instrumento")
 	{
