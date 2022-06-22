@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/app"
@@ -11,12 +12,12 @@ import (
 func main() {
 	fmt.Println("Hello World")
 	router := gin.Default()
-
-	// router.GET("/", func(c *gin.Context) {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"message": "Hello World",
-	// 	})
-	// })
+	router.SetTrustedProxies([]string{"192.168.1.2"})
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello World",
+		})
+	})
 
 	fmt.Println("Iniciando la app...")
 	server, err := app.NewApp()
