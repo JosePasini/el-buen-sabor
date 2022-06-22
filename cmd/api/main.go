@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/app"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/app"
 	"github.com/gin-gonic/gin"
 )
 
