@@ -36,12 +36,9 @@ func NewMySQL(config MySQLConfig) (*MySQL, error) {
 		fmt.Println("[event: fail_db_init][service: db_service] Could not start DB connection %s", err, err.Error())
 		return nil, err
 	}
-	log.Default().Println("::::: Conectandose a la bd ... :::::")
 	if err := mysql.SetLogger(log.New(os.Stderr, "mysql ", log.Ldate|log.Ltime|log.LUTC|log.Llongfile)); err != nil {
 		return nil, err
 	}
-	fmt.Printf("::::: BD Conectada ... :::::")
-	log.Default().Println("::::: BD Conectada ... :::::")
 	return &MySQL{db}, nil
 }
 
