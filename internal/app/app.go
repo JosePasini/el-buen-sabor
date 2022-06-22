@@ -5,7 +5,6 @@ import (
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/controllers"
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/database"
 	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/services"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,11 +41,11 @@ func NewApp() (*App, error) {
 
 func (app *App) RegisterRoutes(router *gin.Engine) {
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
-		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
-	}))
+	// router.Use(cors.New(cors.Config{
+	// 	AllowOrigins: []string{"*"},
+	// 	AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
+	// 	AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
+	// }))
 
 	// router.GET("/ping", func(c *gin.Context) {
 	// 	c.JSON(http.StatusOK, gin.H{
