@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/app"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +20,15 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
+	router.SetTrustedProxies([]string{"192.168.1.2"})
+	fmt.Println("Iniciando la app...")
+	server, err := app.NewApp()
+	server.RegisterRoutes(router)
+	if err != nil {
+		fmt.Println("Error al conectar la app.")
+		server.CerrarDB()
+		return
+	}
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "index.tmpl.html"})
