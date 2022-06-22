@@ -3,8 +3,8 @@ package app
 import (
 	"strings"
 
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
 )
 
 // NewConfig :: Carga de configuración inicial

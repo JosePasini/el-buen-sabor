@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
 	"github.com/jmoiron/sqlx"
 )
 

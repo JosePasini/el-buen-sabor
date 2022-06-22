@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/domain"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/services"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/services"
 	"github.com/gin-gonic/gin"
 )
 

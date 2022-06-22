@@ -1,4 +1,4 @@
-module github.com/JosePasiniMercadolibre/react-instrumentos
+module github.com/JosePasiniMercadolibre/el-buen-sabor
 
 go 1.17
 

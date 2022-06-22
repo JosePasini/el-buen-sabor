@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/domain"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/services"
-	"github.com/JosePasiniMercadolibre/react-instrumentos/internal/instrumentos/storage"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/services"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/storage"
 )
 
 type Container struct {
