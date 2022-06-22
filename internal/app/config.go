@@ -15,7 +15,7 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 
 	godotenv.Load()
 
-	USER_ENV := os.Getenv("DB_USER")
+	USER_ENV := os.Getenv("DB_USERNAME")
 	PASS_ENV := os.Getenv("DB_PASS")
 	HOST_ENV := os.Getenv("DB_HOST")
 	NAME_ENV := os.Getenv("DB_NAME")
