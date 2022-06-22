@@ -31,7 +31,7 @@ func main() {
 	}
 
 	router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "index.tmpl.html"})
+		c.JSON(http.StatusOK, gin.H{"message": "hello world"})
 	})
 
 	router.Run(":" + port)

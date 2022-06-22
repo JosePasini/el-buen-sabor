@@ -1,6 +1,8 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/controllers"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
@@ -47,11 +49,11 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	// 	AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
 	// }))
 
-	// router.GET("/ping", func(c *gin.Context) {
-	// 	c.JSON(http.StatusOK, gin.H{
-	// 		"message": "Hello World",
-	// 	})
-	// })
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
 
 	instrumentoGroup := router.Group("/instrumento")
 	{
