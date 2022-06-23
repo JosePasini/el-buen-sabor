@@ -28,12 +28,11 @@ func (c *LoginController) AddUsuario(ctx *gin.Context) {
 		ctx.JSON(400, errors.New("Error"))
 		return
 	}
-	fmt.Println("Usuario:", usuario.Nombre, usuario.Apellido)
-	fmt.Println("Usuario:", *usuario.Nombre, *usuario.Apellido)
-	// err = c.service.AddUsuario(ctx, usuario)
-	// if err != nil {
-	// 	ctx.JSON(400, errors.New("Error Internal Server"))
-	// 	return
-	// }
-	// ctx.JSON(200, nil)
+	fmt.Println("Usuario:", *usuario.Hash, *usuario.Nombre, *usuario.Apellido, *usuario.Usuario, *usuario.Mail)
+	err = c.service.AddUsuario(ctx, usuario)
+	if err != nil {
+		ctx.JSON(400, errors.New("Error Internal Server"))
+		return
+	}
+	ctx.JSON(200, nil)
 }

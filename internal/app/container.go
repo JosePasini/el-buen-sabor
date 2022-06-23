@@ -24,9 +24,15 @@ func NewContainer(config instrumentos.AppConfig, db database.DB) Container {
 	instrumentoRepository := storage.NewMySQLInstrumentoRepository()
 	instrumentoService := services.NewInstrumentoService(db, instrumentoRepository)
 
+	loginRepository := storage.NewMySQLLoginRepository()
+	loginService := services.NewLoginService(db, loginRepository)
+
 	return Container{
 		Config:                config,
 		InstrumentoService:    instrumentoService,
 		InstrumentoRepository: instrumentoRepository,
+
+		LoginService:    loginService,
+		LoginRepository: loginRepository,
 	}
 }
