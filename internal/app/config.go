@@ -5,13 +5,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/joho/godotenv"
 )
 
 // NewConfig :: Carga de configuración inicial
-func NewConfig(scope string) (instrumentos.AppConfig, error) {
+func NewConfig(scope string) (elbuensabor.AppConfig, error) {
 
 	godotenv.Load()
 
@@ -23,7 +23,7 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 	fmt.Println(":::::", HOST_ENV, " ", USER_ENV, " ", PASS_ENV, " ", NAME_ENV)
 
 	if !strings.Contains(scope, "prod") {
-		return instrumentos.AppConfig{
+		return elbuensabor.AppConfig{
 			DB: database.MySQLConfig{
 				User:     "root",
 				Password: "",
@@ -33,7 +33,7 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 		}, nil
 	}
 
-	return instrumentos.AppConfig{
+	return elbuensabor.AppConfig{
 		DB: database.MySQLConfig{
 			User:     USER_ENV,
 			Password: PASS_ENV,

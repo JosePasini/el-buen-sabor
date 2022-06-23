@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
 	"github.com/jmoiron/sqlx"
 )
 
