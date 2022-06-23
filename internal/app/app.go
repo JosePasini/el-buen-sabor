@@ -3,10 +3,10 @@ package app
 import (
 	"net/http"
 
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/controllers"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/services"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/controllers"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/services"
 	"github.com/gin-gonic/gin"
 )
 
