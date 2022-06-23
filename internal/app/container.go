@@ -13,9 +13,11 @@ type Container struct {
 
 	// Services
 	InstrumentoService services.IInstrumentoService
+	LoginService       services.ILoginService
 
 	// Repositorys
 	InstrumentoRepository domain.IInstrumentoRepository
+	LoginRepository       domain.ILoginRepository
 }
 
 func NewContainer(config instrumentos.AppConfig, db database.DB) Container {

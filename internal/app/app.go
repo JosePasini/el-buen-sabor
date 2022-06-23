@@ -16,6 +16,9 @@ type App struct {
 
 	InstrumentoService    services.IInstrumentoService
 	InstrumentoController controllers.IInstrumentoController
+
+	LoginService    services.ILoginService
+	LoginController controllers.ILoginController
 }
 
 func NewApp() (*App, error) {
@@ -38,6 +41,9 @@ func NewApp() (*App, error) {
 		Config:                config,
 		InstrumentoService:    container.InstrumentoService,
 		InstrumentoController: controllers.NewInstrumentoController(container.InstrumentoService),
+
+		LoginService:    container.LoginService,
+		LoginController: controllers.NewLoginController(container.LoginService),
 	}
 	return &app, nil
 }
@@ -65,6 +71,10 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		instrumentoGroup.PUT("", app.InstrumentoController.UpdateInstrument)
 	}
 
+	login := router.Group("/login")
+	{
+		login.POST("", app.LoginController.AddUsuario)
+	}
 }
 
 func (a *App) CerrarDB() {
