@@ -28,7 +28,7 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 				User:     "root",
 				Password: "",
 				Host:     "localhost",
-				Database: "react",
+				Database: "elbuensabor",
 			},
 		}, nil
 	}
@@ -41,12 +41,4 @@ func NewConfig(scope string) (instrumentos.AppConfig, error) {
 			Database: NAME_ENV,
 		},
 	}, nil
-	// return instrumentos.AppConfig{
-	// 	DB: database.MySQLConfig{
-	// 		User:     "baac4c3d3bb29e",
-	// 		Password: "408399dd",
-	// 		Host:     "us-cdbr-east-05.cleardb.net",
-	// 		Database: "heroku_9952cf2f0b46460",
-	// 	},
-	// }, nil
 }

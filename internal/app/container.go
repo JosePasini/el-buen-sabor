@@ -13,18 +13,26 @@ type Container struct {
 
 	// Services
 	InstrumentoService services.IInstrumentoService
+	LoginService       services.ILoginService
 
 	// Repositorys
 	InstrumentoRepository domain.IInstrumentoRepository
+	LoginRepository       domain.ILoginRepository
 }
 
 func NewContainer(config instrumentos.AppConfig, db database.DB) Container {
 	instrumentoRepository := storage.NewMySQLInstrumentoRepository()
 	instrumentoService := services.NewInstrumentoService(db, instrumentoRepository)
 
+	loginRepository := storage.NewMySQLLoginRepository()
+	loginService := services.NewLoginService(db, loginRepository)
+
 	return Container{
 		Config:                config,
 		InstrumentoService:    instrumentoService,
 		InstrumentoRepository: instrumentoRepository,
+
+		LoginService:    loginService,
+		LoginRepository: loginRepository,
 	}
 }
