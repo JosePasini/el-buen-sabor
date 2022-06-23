@@ -14,11 +14,14 @@ type App struct {
 	db     database.DB
 	Config elbuensabor.AppConfig
 
-	InstrumentoService    services.IInstrumentoService
-	InstrumentoController controllers.IInstrumentoController
-
 	LoginService    services.ILoginService
 	LoginController controllers.ILoginController
+
+	PedidoService    services.IPedidoService
+	PedidoController controllers.IPedidoController
+
+	InstrumentoService    services.IInstrumentoService
+	InstrumentoController controllers.IInstrumentoController
 }
 
 func NewApp() (*App, error) {
@@ -38,12 +41,16 @@ func NewApp() (*App, error) {
 	container := NewContainer(config, mysqlDB)
 
 	app := App{
-		Config:                config,
-		InstrumentoService:    container.InstrumentoService,
-		InstrumentoController: controllers.NewInstrumentoController(container.InstrumentoService),
+		Config: config,
 
 		LoginService:    container.LoginService,
 		LoginController: controllers.NewLoginController(container.LoginService),
+
+		InstrumentoService:    container.InstrumentoService,
+		InstrumentoController: controllers.NewInstrumentoController(container.InstrumentoService),
+
+		PedidoService:    container.PedidoService,
+		PedidoController: controllers.NewPedidoController(container.PedidoService),
 	}
 	return &app, nil
 }
@@ -62,6 +69,12 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		})
 	})
 
+	login := router.Group("/login")
+	{
+		login.GET("", app.LoginController.LoginUsuario)
+		login.POST("/register", app.LoginController.AddUsuario)
+	}
+
 	instrumentoGroup := router.Group("/instrumento")
 	{
 		instrumentoGroup.GET("/:idInstrumento", app.InstrumentoController.GetByID)
@@ -71,10 +84,13 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		instrumentoGroup.PUT("", app.InstrumentoController.UpdateInstrument)
 	}
 
-	login := router.Group("/login")
+	productoGroup := router.Group("/pedido")
 	{
-		login.GET("", app.LoginController.LoginUsuario)
-		login.POST("/register", app.LoginController.AddUsuario)
+		productoGroup.GET("/:idPedido", app.PedidoController.GetByID)
+		productoGroup.POST("", app.PedidoController.AddPedido)
+		productoGroup.GET("/getAll", app.PedidoController.GetAll)
+		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
+		productoGroup.PUT("", app.PedidoController.UpdatePedido)
 	}
 }
 
