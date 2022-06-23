@@ -1,15 +1,15 @@
 package app
 
 import (
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/services"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/storage"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/services"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/storage"
 )
 
 type Container struct {
-	Config instrumentos.AppConfig
+	Config elbuensabor.AppConfig
 
 	// Services
 	InstrumentoService services.IInstrumentoService
@@ -20,7 +20,7 @@ type Container struct {
 	LoginRepository       domain.ILoginRepository
 }
 
-func NewContainer(config instrumentos.AppConfig, db database.DB) Container {
+func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 	instrumentoRepository := storage.NewMySQLInstrumentoRepository()
 	instrumentoService := services.NewInstrumentoService(db, instrumentoRepository)
 

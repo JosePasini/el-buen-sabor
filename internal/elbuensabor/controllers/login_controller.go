@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/services"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/services"
 	"github.com/gin-gonic/gin"
 )
 

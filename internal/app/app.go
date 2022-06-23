@@ -3,16 +3,16 @@ package app
 import (
 	"net/http"
 
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/controllers"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/services"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos"
 	"github.com/gin-gonic/gin"
 )
 
 type App struct {
 	db     database.DB
-	Config instrumentos.AppConfig
+	Config elbuensabor.AppConfig
 
 	InstrumentoService    services.IInstrumentoService
 	InstrumentoController controllers.IInstrumentoController
