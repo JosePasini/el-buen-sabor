@@ -11,6 +11,7 @@ import (
 
 type ILoginService interface {
 	AddUsuario(context.Context, domain.Usuario) error
+	LoginUsuario(context.Context, domain.Login) (bool, error)
 }
 
 type LoginService struct {
@@ -42,4 +43,17 @@ func (s *LoginService) AddUsuario(ctx context.Context, usuario domain.Usuario) e
 		return err
 	})
 	return err
+}
+
+func (s *LoginService) LoginUsuario(ctx context.Context, usuario domain.Login) (bool, error) {
+	var bool = false
+	var hashUserDB string
+	var err error
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		hashUserDB, err = s.repository.GetHash(ctx, tx, usuario.Usuario)
+		return err
+	})
+	fmt.Println("Hash User:", hashUserDB)
+	bool, err = domain.ValidatePassword(usuario.Hash, hashUserDB)
+	return bool, nil
 }
