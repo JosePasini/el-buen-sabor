@@ -14,10 +14,12 @@ type Container struct {
 	// Services
 	InstrumentoService services.IInstrumentoService
 	LoginService       services.ILoginService
+	PedidoService      services.IPedidoService
 
 	// Repositorys
 	InstrumentoRepository domain.IInstrumentoRepository
 	LoginRepository       domain.ILoginRepository
+	PedidoRepository      domain.IPedidoRepository
 }
 
 func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
@@ -27,6 +29,10 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 	loginRepository := storage.NewMySQLLoginRepository()
 	loginService := services.NewLoginService(db, loginRepository)
 
+	pedidoRepository := storage.NewMySQLPedidoRepository()
+	pedidoService := services.NewPedidoService(db, pedidoRepository)
+	//pedidoService := services.NewPedidoService(db, pedidoRepository)
+
 	return Container{
 		Config:                config,
 		InstrumentoService:    instrumentoService,
@@ -34,5 +40,8 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 
 		LoginService:    loginService,
 		LoginRepository: loginRepository,
+
+		PedidoService:    pedidoService,
+		PedidoRepository: pedidoRepository,
 	}
 }
