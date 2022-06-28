@@ -25,8 +25,8 @@ type App struct {
 }
 
 func NewApp() (*App, error) {
-	// scope := ("prod")
-	scope := ("dev")
+	scope := ("prod")
+	//scope := ("dev")
 
 	config, err := NewConfig(scope)
 	if err != nil {
