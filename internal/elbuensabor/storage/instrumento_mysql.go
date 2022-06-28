@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/database"
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/instrumentos/domain"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
+	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
 	"github.com/jmoiron/sqlx"
 )
 
 type instrumentoDB struct {
-	Id              int             `db:"id"`
+	ID              int             `db:"id"`
 	Instrumento     sql.NullString  `db:"instrumento"`
 	Marca           sql.NullString  `db:"marca"`
 	Modelo          sql.NullString  `db:"modelo"`
@@ -23,7 +23,7 @@ type instrumentoDB struct {
 
 func (i *instrumentoDB) toInstrumento() domain.Instrumento {
 	return domain.Instrumento{
-		Id:              i.Id,
+		ID:              i.ID,
 		Instrumento:     database.ToStringP(i.Instrumento),
 		Marca:           database.ToStringP(i.Marca),
 		Modelo:          database.ToStringP(i.Modelo),
@@ -55,7 +55,7 @@ func NewMySQLInstrumentoRepository() *MySQLInstrumentoRepository {
 
 func (i *MySQLInstrumentoRepository) Update(ctx context.Context, tx *sqlx.Tx, ins domain.Instrumento) error {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, ins.Instrumento, ins.Marca, ins.Modelo, ins.Imagen, ins.Precio, ins.CostoEnvio, ins.CantidadVendida, ins.Descripcion, ins.Id)
+	_, err := tx.ExecContext(ctx, query, ins.Instrumento, ins.Marca, ins.Modelo, ins.Imagen, ins.Precio, ins.CostoEnvio, ins.CantidadVendida, ins.Descripcion, ins.ID)
 	return err
 }
 
