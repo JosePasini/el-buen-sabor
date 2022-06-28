@@ -10,15 +10,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-/*
-   `id_cliente` INT,
-   `fecha` DATETIME,
-   `domicilio_envio` VARCHAR(255),
-   `detalle_envio` VARCHAR(255),
-   `delivery` BOOLEAN,
-   `metodo_pago` ENUM('efectivo','mercadopago'),
-*/
-
 type pedidoDB struct {
 	ID             int            `db:"id"`
 	IDCliente      int            `db:"id_cliente"`

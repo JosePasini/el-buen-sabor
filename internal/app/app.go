@@ -75,6 +75,14 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		login.POST("/register", app.LoginController.AddUsuario)
 	}
 
+	usuarios := router.Group("/usuarios")
+	{
+		usuarios.GET("", app.LoginController.GetAllUsuarios)
+		usuarios.GET("/:id", app.LoginController.GetUsuarioByID)
+		usuarios.DELETE("/:id", app.LoginController.DeleteUsuarioByID)
+		usuarios.PUT("", app.LoginController.UpdateUsuario)
+	}
+
 	instrumentoGroup := router.Group("/instrumento")
 	{
 		instrumentoGroup.GET("/:idInstrumento", app.InstrumentoController.GetByID)
