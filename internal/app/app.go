@@ -7,6 +7,7 @@ import (
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/controllers"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/services"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,11 +58,11 @@ func NewApp() (*App, error) {
 
 func (app *App) RegisterRoutes(router *gin.Engine) {
 
-	// router.Use(cors.New(cors.Config{
-	// 	AllowOrigins: []string{"*"},
-	// 	AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
-	// 	AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
-	// }))
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
+		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
+	}))
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
