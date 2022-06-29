@@ -72,7 +72,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	login := router.Group("/login")
 	{
-		login.GET("", app.LoginController.LoginUsuario)
+		login.POST("", app.LoginController.LoginUsuario)
 		login.POST("/register", app.LoginController.AddUsuario)
 	}
 
