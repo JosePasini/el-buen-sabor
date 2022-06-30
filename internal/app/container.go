@@ -12,19 +12,19 @@ type Container struct {
 	Config elbuensabor.AppConfig
 
 	// Services
-	InstrumentoService services.IInstrumentoService
-	LoginService       services.ILoginService
-	PedidoService      services.IPedidoService
+	FacturaService services.IFacturaService
+	LoginService   services.ILoginService
+	PedidoService  services.IPedidoService
 
 	// Repositorys
-	InstrumentoRepository domain.IInstrumentoRepository
+	InstrumentoRepository domain.IFacturaRepository
 	LoginRepository       domain.ILoginRepository
 	PedidoRepository      domain.IPedidoRepository
 }
 
 func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
-	instrumentoRepository := storage.NewMySQLInstrumentoRepository()
-	instrumentoService := services.NewInstrumentoService(db, instrumentoRepository)
+	facturaRepository := storage.NewMySQLInstrumentoRepository()
+	facturaService := services.NewFacturaService(db, facturaRepository)
 
 	loginRepository := storage.NewMySQLLoginRepository()
 	loginService := services.NewLoginService(db, loginRepository)
@@ -35,8 +35,8 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 
 	return Container{
 		Config:                config,
-		InstrumentoService:    instrumentoService,
-		InstrumentoRepository: instrumentoRepository,
+		FacturaService:        facturaService,
+		InstrumentoRepository: facturaRepository,
 
 		LoginService:    loginService,
 		LoginRepository: loginRepository,

@@ -28,3 +28,16 @@ CREATE TABLE `elbuensabor`.`pedidos` (
     `metodo_pago` ENUM('efectivo','mercadopago'),
     PRIMARY KEY (`id`)
 );
+
+DROP TABLE IF EXISTS pedidos;
+CREATE TABLE `elbuensabor`.`factura` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `fecha` DATETIME,
+    `numero_factura` INT,
+    `monto_descuento` FLOAT,
+    `forma_pago` VARCHAR(255),
+    `numero_tarjeta` VARCHAR(255),
+	`total_venta` FLOAT,
+    `total_costo` FLOAT,
+    PRIMARY KEY (`id`)
+);

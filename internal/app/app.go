@@ -21,8 +21,8 @@ type App struct {
 	PedidoService    services.IPedidoService
 	PedidoController controllers.IPedidoController
 
-	InstrumentoService    services.IInstrumentoService
-	InstrumentoController controllers.IInstrumentoController
+	FacturaService    services.IFacturaService
+	FacturaController controllers.IFacturaController
 }
 
 func NewApp() (*App, error) {
@@ -47,8 +47,8 @@ func NewApp() (*App, error) {
 		LoginService:    container.LoginService,
 		LoginController: controllers.NewLoginController(container.LoginService),
 
-		InstrumentoService:    container.InstrumentoService,
-		InstrumentoController: controllers.NewInstrumentoController(container.InstrumentoService),
+		FacturaService:    container.FacturaService,
+		FacturaController: controllers.NewFacturaController(container.FacturaService),
 
 		PedidoService:    container.PedidoService,
 		PedidoController: controllers.NewPedidoController(container.PedidoService),
@@ -84,13 +84,13 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		usuarios.PUT("", app.LoginController.UpdateUsuario)
 	}
 
-	instrumentoGroup := router.Group("/instrumento")
+	instrumentoGroup := router.Group("/factura")
 	{
-		instrumentoGroup.GET("/:idInstrumento", app.InstrumentoController.GetByID)
-		instrumentoGroup.POST("", app.InstrumentoController.AddInstrument)
-		instrumentoGroup.GET("/getAll", app.InstrumentoController.GetAll)
-		instrumentoGroup.DELETE("/:idInstrumento", app.InstrumentoController.DeleteInstrument)
-		instrumentoGroup.PUT("", app.InstrumentoController.UpdateInstrument)
+		instrumentoGroup.GET("/:idFactura", app.FacturaController.GetByID)
+		instrumentoGroup.POST("", app.FacturaController.AddFactura)
+		instrumentoGroup.GET("/getAll", app.FacturaController.GetAll)
+		instrumentoGroup.DELETE("/:idFactura", app.FacturaController.DeleteFactura)
+		instrumentoGroup.PUT("", app.FacturaController.UpdateFactura)
 	}
 
 	productoGroup := router.Group("/pedido")
