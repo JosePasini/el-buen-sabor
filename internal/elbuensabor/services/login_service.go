@@ -14,6 +14,7 @@ type ILoginService interface {
 	LoginUsuario(context.Context, domain.Login) (bool, error)
 	GetAllUsuarios(context.Context) ([]domain.UsuarioResponse, error)
 	GetUsuarioByID(context.Context, int) (domain.UsuarioResponse, error)
+	GetUsuarioByEmail(context.Context, string) (domain.UsuarioResponse, error)
 	DeleteUsuarioByID(context.Context, int) (bool, error)
 	UpdateUsuario(context.Context, domain.Usuario) (domain.Usuario, error)
 }
@@ -74,6 +75,20 @@ func (s *LoginService) GetUsuarioByID(ctx context.Context, id int) (domain.Usuar
 	var err error
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		usuario, err = s.repository.GetUsuarioByID(ctx, tx, id)
+		return err
+	})
+	if err != nil {
+		return domain.UsuarioResponse{}, err
+	}
+	fmt.Println("Usuario:", usuario)
+	return usuario, nil
+}
+
+func (s *LoginService) GetUsuarioByEmail(ctx context.Context, email string) (domain.UsuarioResponse, error) {
+	var usuario domain.UsuarioResponse
+	var err error
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		usuario, err = s.repository.GetUsuarioByEmail(ctx, tx, email)
 		return err
 	})
 	if err != nil {

@@ -58,10 +58,16 @@ func (c *LoginController) LoginUsuario(ctx *gin.Context) {
 		ctx.JSON(401, gin.H{"message": "crecendiales incorrectas"})
 		return
 	}
+
+	user, err := c.service.GetUsuarioByEmail(ctx, login.Email)
+	if err != nil {
+		ctx.JSON(401, gin.H{"message": "error get user by email"})
+	}
 	fmt.Println("Login Correcto")
 	fmt.Println("Login", login)
 	fmt.Println("Ok:", ok)
-	ctx.JSON(200, gin.H{"message": "crecendiales correctas"})
+
+	ctx.JSON(200, user)
 }
 
 func (c *LoginController) GetAllUsuarios(ctx *gin.Context) {

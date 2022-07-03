@@ -58,6 +58,7 @@ type MySQLLoginRepository struct {
 	qDeleteById string
 	qUpdate     string
 	qGetHash    string
+	qGetByEmail string
 }
 
 func NewMySQLLoginRepository() *MySQLLoginRepository {
@@ -65,6 +66,7 @@ func NewMySQLLoginRepository() *MySQLLoginRepository {
 		qInsert:     "INSERT INTO usuarios (nombre, apellido, email, usuario, hash) VALUES (?,?,?,?,?);",
 		qGetAll:     "SELECT id, nombre, apellido, email, usuario, rol FROM usuarios",
 		qGetByID:    "SELECT id, nombre, apellido, email, usuario, rol FROM usuarios WHERE id = ?",
+		qGetByEmail: "SELECT id, nombre, apellido, email, usuario, rol FROM usuarios WHERE email = ?",
 		qDeleteById: "DELETE FROM usuarios WHERE id = ?",
 		qUpdate:     "UPDATE usuarios SET nombre = COALESCE(?,nombre), apellido = COALESCE(?,apellido), usuario = COALESCE(?,usuario) , email = COALESCE(?,email), hash = COALESCE(?,hash) WHERE id = ?",
 		qGetHash:    "SELECT hash FROM usuarios WHERE email = ?",
@@ -113,6 +115,19 @@ func (i *MySQLLoginRepository) GetUsuarioByID(ctx context.Context, tx *sqlx.Tx, 
 	var usuario loginResponseDB
 
 	row := tx.QueryRowxContext(ctx, query, id)
+	err := row.StructScan(&usuario)
+	if err != nil {
+		return domain.UsuarioResponse{}, err
+	}
+	usuarioResponse := usuario.toLoginResponseDB()
+	return usuarioResponse, nil
+}
+
+func (i *MySQLLoginRepository) GetUsuarioByEmail(ctx context.Context, tx *sqlx.Tx, email string) (domain.UsuarioResponse, error) {
+	query := i.qGetByEmail
+	var usuario loginResponseDB
+
+	row := tx.QueryRowxContext(ctx, query, email)
 	err := row.StructScan(&usuario)
 	if err != nil {
 		return domain.UsuarioResponse{}, err
