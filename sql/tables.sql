@@ -41,3 +41,34 @@ CREATE TABLE `elbuensabor`.`factura` (
     `total_costo` FLOAT,
     PRIMARY KEY (`id`)
 );
+
+DROP TABLE IF EXISTS articulo_insumo;
+CREATE TABLE `elbuensabor`.`articulo_insumo` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `denominación` VARCHAR(255),
+    `precio_compra` FLOAT,
+    `precio_venta` FLOAT,
+    `stock_actual` INT,
+    `stock_minimo` INT,
+	`unidad_medida` VARCHAR(255),
+    `es_insumo` BOOL,
+    PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS articulo_manufacturado_detalle;
+CREATE TABLE `elbuensabor`.`articulo_manufacturado_detalle` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+	`cantidad` FLOAT,
+    `unidad_medida` VARCHAR(255),
+    PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS articulo_manufacturado;
+CREATE TABLE `elbuensabor`.`articulo_manufacturado` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+	`tiempo_estimado_cocina` INT,
+	`denominacion` VARCHAR(255),
+	`precio_venta` FLOAT,
+    `imagen` VARCHAR(255),
+    PRIMARY KEY (`id`)
+);

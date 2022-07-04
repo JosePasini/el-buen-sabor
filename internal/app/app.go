@@ -23,11 +23,20 @@ type App struct {
 
 	FacturaService    services.IFacturaService
 	FacturaController controllers.IFacturaController
+
+	ArticuloManufacturadoDetalleService    services.IArticuloManufacturadoDetalleService
+	ArticuloManufacturadoDetalleController controllers.IArticuloManufacturadoDetalleController
+
+	ArticuloManufacturadoService    services.IArticuloManufacturadoService
+	ArticuloManufacturadoController controllers.IArticuloManufacturadoController
+
+	ArticuloInsumoService    services.IArticuloInsumoService
+	ArticuloInsumoController controllers.IArticuloInsumoController
 }
 
 func NewApp() (*App, error) {
-	scope := ("prod")
-	//scope := ("dev")
+	//scope := ("prod")
+	scope := ("dev")
 
 	config, err := NewConfig(scope)
 	if err != nil {
@@ -42,16 +51,22 @@ func NewApp() (*App, error) {
 	container := NewContainer(config, mysqlDB)
 
 	app := App{
-		Config: config,
+		db:                                     mysqlDB,
+		Config:                                 config,
+		LoginService:                           container.LoginService,
+		LoginController:                        controllers.NewLoginController(container.LoginService),
+		PedidoService:                          container.PedidoService,
+		PedidoController:                       controllers.NewPedidoController(container.PedidoService),
+		FacturaService:                         container.FacturaService,
+		FacturaController:                      controllers.NewFacturaController(container.FacturaService),
+		ArticuloManufacturadoDetalleService:    container.ArticuloManufacturadoDetalleService,
+		ArticuloManufacturadoDetalleController: controllers.NewArticuloManufacturadoDetalleController(container.ArticuloManufacturadoDetalleService),
 
-		LoginService:    container.LoginService,
-		LoginController: controllers.NewLoginController(container.LoginService),
+		ArticuloManufacturadoService:    container.ArticuloManufacturadoService,
+		ArticuloManufacturadoController: controllers.NewArticuloManufacturadoController(container.ArticuloManufacturadoService),
 
-		FacturaService:    container.FacturaService,
-		FacturaController: controllers.NewFacturaController(container.FacturaService),
-
-		PedidoService:    container.PedidoService,
-		PedidoController: controllers.NewPedidoController(container.PedidoService),
+		ArticuloInsumoService:    container.ArticuloInsumoService,
+		ArticuloInsumoController: controllers.NewArticuloInsumoController(container.ArticuloInsumoService),
 	}
 	return &app, nil
 }
@@ -70,10 +85,14 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		})
 	})
 
+	register := router.Group("/register")
+	{
+		register.POST("", app.LoginController.AddUsuario)
+	}
+
 	login := router.Group("/login")
 	{
 		login.POST("", app.LoginController.LoginUsuario)
-		login.POST("/register", app.LoginController.AddUsuario)
 	}
 
 	usuarios := router.Group("/usuarios")
@@ -101,6 +120,34 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)
 	}
+
+	articuloManufacturadoDetalle := router.Group("/articulo-manufacturado-detalle")
+	{
+		articuloManufacturadoDetalle.GET("/:id", app.ArticuloManufacturadoDetalleController.GetByID)
+		articuloManufacturadoDetalle.POST("", app.ArticuloManufacturadoDetalleController.AddArticuloManufacturadoDetalle)
+		articuloManufacturadoDetalle.GET("/getAll", app.ArticuloManufacturadoDetalleController.GetAll)
+		articuloManufacturadoDetalle.DELETE("/:id", app.ArticuloManufacturadoDetalleController.DeleteArticuloManufacturadoDetalle)
+		articuloManufacturadoDetalle.PUT("", app.ArticuloManufacturadoDetalleController.UpdateArticuloManufacturadoDetalle)
+	}
+
+	articuloManufacturado := router.Group("/articulo-manufacturado")
+	{
+		articuloManufacturado.GET("/:id", app.ArticuloManufacturadoController.GetByID)
+		articuloManufacturado.POST("", app.ArticuloManufacturadoController.AddArticuloManufacturado)
+		articuloManufacturado.GET("/getAll", app.ArticuloManufacturadoController.GetAll)
+		articuloManufacturado.DELETE("/:id", app.ArticuloManufacturadoController.DeleteArticuloManufacturado)
+		articuloManufacturado.PUT("", app.ArticuloManufacturadoController.UpdateArticuloManufacturado)
+	}
+
+	articuloInsumo := router.Group("/articulo-insumo")
+	{
+		articuloInsumo.GET("/:id", app.ArticuloInsumoController.GetByID)
+		articuloInsumo.POST("", app.ArticuloInsumoController.AddArticuloInsumo)
+		articuloInsumo.GET("/getAll", app.ArticuloInsumoController.GetAll)
+		articuloInsumo.DELETE("/:id", app.ArticuloInsumoController.DeleteArticuloInsumo)
+		articuloInsumo.PUT("", app.ArticuloInsumoController.UpdateArticuloInsumo)
+	}
+
 }
 
 func (a *App) CerrarDB() {
