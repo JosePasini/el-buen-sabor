@@ -1,0 +1,437 @@
+openapi: 3.0.1
+info:
+  title: El Buen Sabor - Proyecto Final - Universidad Tecnológica Nacional.
+  description: Proyecto e-commerce, contiene login, registro, roles y sistema de gestión de comandas gastronómicas.
+  version: 1.0.0 and no more
+servers:
+- url: https://frontprueba.herokuapp.com/
+tags:
+- name: Login
+  description: Responsable de manejar el login de la app.
+- name: Register
+  description: Responsable de manejar el registro de la app.
+- name: Facturas
+  description: Responsable de gestionar las facturas de compra.
+- name: Pedidos
+  description: Responsable de manejar los pedidos.
+- name: Usuarios
+  description: Responsable de manejar los pedidos.
+
+paths:
+  /register:
+    post:
+      tags:
+      - Register
+      summary: Agrega un usuario a la base de datos
+      description: Agrega un usuario a la base de datos
+      operationId: addUsuario
+      requestBody:
+        description: Se necesita un objeto usuario para poder ser creado
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuarios'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+
+  /login:
+    post:
+      tags:
+      - Login
+      summary: Loguea un usuario en la app.
+      description: Servicio para acceder a la aplicación, debes estar registrado anteriormente.
+      operationId: LoginUsuario
+      requestBody:
+        description: Ingrese usuario y contraseña.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+  
+  /usuarios/{id}:
+    get:
+      tags:
+      - Usuarios
+      summary: Get usuario
+      description: Get a usuario by id
+      operationId: getUsuarioByID
+      parameters:
+      - name: id
+        in: path
+        description: Usuario ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuarios'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+    delete:
+      tags:
+      - Usuarios
+      summary: Delete usuario by ID
+      description: Delete usuario by ID
+      operationId: deleteUsuarioByID
+      parameters:
+      - name: id
+        in: path
+        description: Usuarios ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successfully deleted usuario
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+  /usuarios:
+    get:
+      tags:
+      - Usuarios
+      summary: Get all users
+      description: Obtiene todos los usuarios registrados en la BD.
+      operationId: GetAllUsuarios
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Usuarios'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+    put:
+      tags:
+      - Usuarios
+      summary: Update usuario
+      description: Actualizar un usuario existente
+      operationId: updateUsuario
+      requestBody:
+        description: Es necesario un objeto Usuario para ser actualizado.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuarios'
+        required: true
+      responses:
+        200:
+          description: Successfully update usuarios
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+          
+          
+  /factura:
+    post:
+      tags:
+      - Facturas
+      summary: Agrega una factura a la base de datos
+      description: Agrega una factura a la base de datos
+      operationId: AddFactura
+      requestBody:
+        description: Se necesita un objeto factura para ser crada. 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Facturas'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+    put:
+      tags:
+      - Facturas
+      summary: Update facturas
+      description: Actualizar una factura existente
+      operationId: updateFactura
+      requestBody:
+        description: Es necesario un objeto Factura para ser actualizado.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Facturas'
+        required: true
+      responses:
+        200:
+          description: Successfully update factuas
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+  /factura/getAll:
+    get:
+      tags:
+      - Facturas
+      summary: Get all facturas
+      description: Obtiene todos las facturas registradas en la BD.
+      operationId: GetAll
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facturas'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+  /factura/{id}:
+    get:
+      tags:
+      - Facturas
+      summary: Get facturas
+      description: Get a factura by id
+      operationId: getFacturaByID
+      parameters:
+      - name: id
+        in: path
+        description: Factura ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Facturas'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+    delete:
+      tags:
+      - Facturas
+      summary: Delete facturas by ID
+      description: Delete factura by ID
+      operationId: deleteFacturaByID
+      parameters:
+      - name: id
+        in: path
+        description: Delete Factura by ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successfully deleted factura
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+
+
+  /pedido:
+    post:
+      tags:
+      - Pedidos
+      summary: Agrega un pedido a la base de datos
+      description: Agrega un pedido a la base de datos
+      operationId: AddPedido
+      requestBody:
+        description: Se necesita un objeto pedido para ser creado. 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedidos'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+    put:
+      tags:
+      - Pedidos
+      summary: Update facturas
+      description: Actualizar un pedido existente
+      operationId: updatePedido
+      requestBody:
+        description: Es necesario un objeto Pedido para ser actualizado.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pedidos'
+        required: true
+      responses:
+        200:
+          description: Successfully update pedido
+          content: {}
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+  /pedido/getAll:
+    get:
+      tags:
+      - Pedidos
+      summary: Get all pedidos
+      description: Obtiene todos los pedidos registradas en la BD.
+      operationId: GetAllPedidos
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pedidos'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+  /pedido/{id}:
+    get:
+      tags:
+      - Pedidos
+      summary: Get pedido
+      description: Get a pedido by id
+      operationId: getPedidoByID
+      parameters:
+      - name: id
+        in: path
+        description: Pedido ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedidos'
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+    delete:
+      tags:
+      - Pedidos
+      summary: Delete pedido by ID
+      description: Delete pedido by ID
+      operationId: deletePedidoByID
+      parameters:
+      - name: id
+        in: path
+        description: Delete Pedido by ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successfully deleted pedido
+        400:
+          description: Bad Request by invalid data in payload
+          content: {}
+
+
+components:
+  schemas:
+    Pedidos:
+      type: object
+      properties:
+        id:
+          type: integer
+        id_cliente:
+          type: integer
+        fecha:
+          type: string
+          format: YYYY-MM-DDTHH:mm:ssZ
+        domicilio_envio:
+          type: string
+        detalle_envio:
+          type: string
+        delivery:
+          type: boolean
+        metodo_pago:
+          type: string
+          enum: ['efectivo', 'mercadopago']
+    Usuarios:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        apellido:
+          type: string
+        usuario:
+          type: string
+        email:
+          type: string
+        hash:
+          type: string
+        telefono:
+          type: integer
+        rol:
+          type: integer
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        hash:
+          type: string
+    Facturas:
+      type: object
+      properties:
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: YYYY-MM-DDTHH:mm:ssZ
+        numero_factura:
+          type: integer
+        monto_descuento:
+          type: number
+        forma_pago:
+          type: string
+        numero_tarjeta:
+          type: string
+        total_venta:
+          type: number
+        total_costo:
+          type: number
