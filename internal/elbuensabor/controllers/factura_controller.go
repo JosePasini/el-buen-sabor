@@ -125,7 +125,6 @@ func (c *FacturaController) UpdateFactura(ctx *gin.Context) {
 
 	err := ctx.BindJSON(&factura)
 	fmt.Println("Factura:", factura)
-	//fmt.Println("Numero Factura:", *&factura.NumeroFactura)
 
 	if err != nil {
 		ctx.JSON(400, errors.New("invalid factura to be updated"))

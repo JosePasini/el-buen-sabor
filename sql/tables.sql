@@ -18,6 +18,7 @@ CREATE TABLE `elbuensabor`.`usuarios` (
 );
 
 DROP TABLE IF EXISTS `elbuensabor`.`pedidos`;
+
 CREATE TABLE `elbuensabor`.`pedidos` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `id_cliente` INT(255),
@@ -25,11 +26,12 @@ CREATE TABLE `elbuensabor`.`pedidos` (
     `domicilio_envio` VARCHAR(255),
     `detalle_envio` VARCHAR(255),
     `delivery` BOOLEAN,
-    `metodo_pago` ENUM('efectivo','mercadopago'),
+    `metodo_pago` ENUM('efectivo', 'mercadopago'),
     PRIMARY KEY (`id`)
 );
 
 DROP TABLE IF EXISTS pedidos;
+
 CREATE TABLE `elbuensabor`.`factura` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `fecha` DATETIME,
@@ -37,38 +39,41 @@ CREATE TABLE `elbuensabor`.`factura` (
     `monto_descuento` FLOAT,
     `forma_pago` VARCHAR(255),
     `numero_tarjeta` VARCHAR(255),
-	`total_venta` FLOAT,
+    `total_venta` FLOAT,
     `total_costo` FLOAT,
     PRIMARY KEY (`id`)
 );
 
 DROP TABLE IF EXISTS articulo_insumo;
+
 CREATE TABLE `elbuensabor`.`articulo_insumo` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-    `denominación` VARCHAR(255),
+    `denominacion` VARCHAR(255),
     `precio_compra` FLOAT,
     `precio_venta` FLOAT,
     `stock_actual` INT,
     `stock_minimo` INT,
-	`unidad_medida` VARCHAR(255),
+    `unidad_medida` VARCHAR(255),
     `es_insumo` BOOL,
     PRIMARY KEY (`id`)
 );
 
 DROP TABLE IF EXISTS articulo_manufacturado_detalle;
+
 CREATE TABLE `elbuensabor`.`articulo_manufacturado_detalle` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-	`cantidad` FLOAT,
+    `cantidad` FLOAT,
     `unidad_medida` VARCHAR(255),
     PRIMARY KEY (`id`)
 );
 
 DROP TABLE IF EXISTS articulo_manufacturado;
+
 CREATE TABLE `elbuensabor`.`articulo_manufacturado` (
     `id` bigint NOT NULL AUTO_INCREMENT,
-	`tiempo_estimado_cocina` INT,
-	`denominacion` VARCHAR(255),
-	`precio_venta` FLOAT,
+    `tiempo_estimado_cocina` INT,
+    `denominacion` VARCHAR(255),
+    `precio_venta` FLOAT,
     `imagen` VARCHAR(255),
     PRIMARY KEY (`id`)
 );

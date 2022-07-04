@@ -121,6 +121,15 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)
 	}
 
+	articuloInsumo := router.Group("/articulo-insumo")
+	{
+		articuloInsumo.GET("/:id", app.ArticuloInsumoController.GetByID)
+		articuloInsumo.POST("", app.ArticuloInsumoController.AddArticuloInsumo)
+		articuloInsumo.GET("/getAll", app.ArticuloInsumoController.GetAll)
+		articuloInsumo.DELETE("/:id", app.ArticuloInsumoController.DeleteArticuloInsumo)
+		articuloInsumo.PUT("", app.ArticuloInsumoController.UpdateArticuloInsumo)
+	}
+
 	articuloManufacturadoDetalle := router.Group("/articulo-manufacturado-detalle")
 	{
 		articuloManufacturadoDetalle.GET("/:id", app.ArticuloManufacturadoDetalleController.GetByID)
@@ -137,15 +146,6 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		articuloManufacturado.GET("/getAll", app.ArticuloManufacturadoController.GetAll)
 		articuloManufacturado.DELETE("/:id", app.ArticuloManufacturadoController.DeleteArticuloManufacturado)
 		articuloManufacturado.PUT("", app.ArticuloManufacturadoController.UpdateArticuloManufacturado)
-	}
-
-	articuloInsumo := router.Group("/articulo-insumo")
-	{
-		articuloInsumo.GET("/:id", app.ArticuloInsumoController.GetByID)
-		articuloInsumo.POST("", app.ArticuloInsumoController.AddArticuloInsumo)
-		articuloInsumo.GET("/getAll", app.ArticuloInsumoController.GetAll)
-		articuloInsumo.DELETE("/:id", app.ArticuloInsumoController.DeleteArticuloInsumo)
-		articuloInsumo.PUT("", app.ArticuloInsumoController.UpdateArticuloInsumo)
 	}
 
 }
