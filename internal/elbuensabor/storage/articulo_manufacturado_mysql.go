@@ -12,12 +12,16 @@ import (
 type articuloManufacturadoDB struct {
 	ID           int            `db:"id"`
 	Denominacion sql.NullString `db:"denominacion"`
+	PrecioVenta  float64        `db:"precio_venta"`
+	Imagen       sql.NullString `db:"imagen"`
 }
 
 func (a *articuloManufacturadoDB) toArticuloManufacturado() domain.ArticuloManufacturado {
 	return domain.ArticuloManufacturado{
 		ID:           a.ID,
 		Denominacion: database.ToStringP(a.Denominacion),
+		PrecioVenta:  a.PrecioVenta,
+		Imagen:       database.ToStringP(a.Imagen),
 	}
 }
 
@@ -37,22 +41,19 @@ type MySQLArticuloManufacturadoRepository struct {
 	qUpdate     string
 }
 
-//  fecha (Date)
-// número (int) montoDescuento (double) formaPago(String) nroTarjeta(String) totalVenta (double) totalCosto (double)
-
 func NewMySQLArticuloManufacturadoRepository() *MySQLArticuloManufacturadoRepository {
 	return &MySQLArticuloManufacturadoRepository{
-		qInsert:     "INSERT INTO articulo_manufacturado (denominacion) VALUES (?)",
-		qGetByID:    "SELECT id, denominacion FROM articulo_manufacturado WHERE id = ?",
-		qGetAll:     "SELECT id, denominacion FROM articulo_manufacturado",
+		qInsert:     "INSERT INTO articulo_manufacturado (denominacion, precio_venta, imagen) VALUES (?,?,?)",
+		qGetByID:    "SELECT id, denominacion, precio_venta, imagen FROM articulo_manufacturado WHERE id = ?",
+		qGetAll:     "SELECT id, denominacion, precio_venta, imagen FROM articulo_manufacturado",
 		qDeleteById: "DELETE FROM articulo_manufacturado WHERE id = ?",
-		qUpdate:     "UPDATE articulo_manufacturado SET denominacion = COALESCE(?,denominacion) WHERE id = ?",
+		qUpdate:     "UPDATE articulo_manufacturado SET denominacion = COALESCE(?,denominacion), precio_venta = COALESCE(?,precio_venta), imagen = COALESCE(?,imagen) WHERE id = ?",
 	}
 }
 
-func (i *MySQLArticuloManufacturadoRepository) Update(ctx context.Context, tx *sqlx.Tx, artManufacturado domain.ArticuloManufacturado) error {
+func (i *MySQLArticuloManufacturadoRepository) Update(ctx context.Context, tx *sqlx.Tx, artMano domain.ArticuloManufacturado) error {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, artManufacturado.Denominacion, artManufacturado.ID)
+	_, err := tx.ExecContext(ctx, query, artMano.Denominacion, artMano.PrecioVenta, artMano.Imagen, artMano.ID)
 	return err
 }
 
@@ -62,9 +63,9 @@ func (i *MySQLArticuloManufacturadoRepository) Delete(ctx context.Context, tx *s
 	return err
 }
 
-func (i *MySQLArticuloManufacturadoRepository) Insert(ctx context.Context, tx *sqlx.Tx, artManufacturado domain.ArticuloManufacturado) error {
+func (i *MySQLArticuloManufacturadoRepository) Insert(ctx context.Context, tx *sqlx.Tx, artMano domain.ArticuloManufacturado) error {
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, artManufacturado.Denominacion)
+	_, err := tx.ExecContext(ctx, query, artMano.Denominacion, artMano.PrecioVenta, artMano.Imagen)
 	return err
 }
 

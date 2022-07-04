@@ -2,22 +2,24 @@ package storage
 
 import (
 	"context"
-	"database/sql"
 
-	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
 	"github.com/jmoiron/sqlx"
 )
 
 type articuloManufacturadoDetalleDB struct {
-	ID           int            `db:"id"`
-	UnidadMedida sql.NullString `db:"unidad_medida"`
+	ID                      int `db:"id"`
+	Cantidad                int `db:"cantidad"`
+	IDArticuloManufacturado int `db:"id_articulo_manufacturado"`
+	IDArticuloInsumo        int `db:"id_articulo_insumo"`
 }
 
 func (a *articuloManufacturadoDetalleDB) toArticuloManufacturadoDetalle() domain.ArticuloManufacturadoDetalle {
 	return domain.ArticuloManufacturadoDetalle{
-		ID:           a.ID,
-		UnidadMedida: *database.ToStringP(a.UnidadMedida),
+		ID:                      a.ID,
+		Cantidad:                a.Cantidad,
+		IDArticuloManufacturado: a.IDArticuloManufacturado,
+		IDArticuloInsumo:        a.IDArticuloInsumo,
 	}
 }
 
@@ -40,15 +42,15 @@ type MySQLArticuloManufacturadoDetalleRepository struct {
 func NewMySQLArticuloManufacturadoDetalleRepository() *MySQLArticuloManufacturadoDetalleRepository {
 	return &MySQLArticuloManufacturadoDetalleRepository{
 		qInsert:     "INSERT INTO articulo_manufacturado_detalle (unidad_medida) VALUES (?)",
-		qGetByID:    "SELECT id, unidad_medida FROM articulo_manufacturado_detalle WHERE id = ?",
-		qGetAll:     "SELECT id, unidad_medida FROM articulo_manufacturado_detalle",
+		qGetByID:    "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle WHERE id = ?",
+		qGetAll:     "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle",
 		qDeleteById: "DELETE FROM articulo_manufacturado_detalle WHERE id = ?",
-		qUpdate:     "UPDATE articulo_manufacturado_detalle SET unidad_medida = COALESCE(?,unidad_medida) WHERE id = ?",
+		qUpdate:     "UPDATE articulo_manufacturado_detalle SET cantidad = COALESCE(?,cantidad) WHERE id = ?",
 	}
 }
-func (i *MySQLArticuloManufacturadoDetalleRepository) Update(ctx context.Context, tx *sqlx.Tx, artManufacturado domain.ArticuloManufacturadoDetalle) error {
+func (i *MySQLArticuloManufacturadoDetalleRepository) Update(ctx context.Context, tx *sqlx.Tx, artManu domain.ArticuloManufacturadoDetalle) error {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, artManufacturado.UnidadMedida, artManufacturado.ID)
+	_, err := tx.ExecContext(ctx, query, artManu.Cantidad, artManu.IDArticuloManufacturado, artManu.IDArticuloInsumo, artManu.ID)
 	return err
 }
 
@@ -58,9 +60,9 @@ func (i *MySQLArticuloManufacturadoDetalleRepository) Delete(ctx context.Context
 	return err
 }
 
-func (i *MySQLArticuloManufacturadoDetalleRepository) Insert(ctx context.Context, tx *sqlx.Tx, artManufacturado domain.ArticuloManufacturadoDetalle) error {
+func (i *MySQLArticuloManufacturadoDetalleRepository) Insert(ctx context.Context, tx *sqlx.Tx, artManu domain.ArticuloManufacturadoDetalle) error {
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, artManufacturado.UnidadMedida)
+	_, err := tx.ExecContext(ctx, query, artManu.Cantidad, artManu.IDArticuloManufacturado, artManu.IDArticuloInsumo)
 	return err
 }
 

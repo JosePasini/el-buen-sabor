@@ -63,7 +63,8 @@ DROP TABLE IF EXISTS articulo_manufacturado_detalle;
 CREATE TABLE `elbuensabor`.`articulo_manufacturado_detalle` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `cantidad` FLOAT,
-    `unidad_medida` VARCHAR(255),
+    `id_articulo_manufacturado` INT,
+    `id_articulo_insumo` INT,
     PRIMARY KEY (`id`)
 );
 
