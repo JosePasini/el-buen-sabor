@@ -10,17 +10,17 @@ import (
 )
 
 type articuloManufacturadoDB struct {
-	ID           int            `db:"id"`
-	Denominacion sql.NullString `db:"denominacion"`
-	PrecioVenta  float64        `db:"precio_venta"`
-	Imagen       sql.NullString `db:"imagen"`
+	ID           int             `db:"id"`
+	Denominacion sql.NullString  `db:"denominacion"`
+	PrecioVenta  sql.NullFloat64 `db:"precio_venta"`
+	Imagen       sql.NullString  `db:"imagen"`
 }
 
 func (a *articuloManufacturadoDB) toArticuloManufacturado() domain.ArticuloManufacturado {
 	return domain.ArticuloManufacturado{
 		ID:           a.ID,
 		Denominacion: database.ToStringP(a.Denominacion),
-		PrecioVenta:  a.PrecioVenta,
+		PrecioVenta:  database.ToFloat64P(a.PrecioVenta),
 		Imagen:       database.ToStringP(a.Imagen),
 	}
 }

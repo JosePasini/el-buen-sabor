@@ -10,24 +10,24 @@ import (
 )
 
 type articuloInsumoDB struct {
-	ID           int            `db:"id"`
-	Denominacion sql.NullString `db:"denominacion"`
-	PrecioCompra float64        `db:"precio_compra"`
-	PrecioVenta  float64        `db:"precio_venta"`
-	StockActual  int            `db:"stock_actual"`
-	StockMinimo  int            `db:"stock_minimo"`
-	UnidadMedida sql.NullString `db:"unidad_medida"`
-	EsInsumo     sql.NullBool   `db:"es_insumo"`
+	ID           int             `db:"id"`
+	Denominacion sql.NullString  `db:"denominacion"`
+	PrecioCompra sql.NullFloat64 `db:"precio_compra"`
+	PrecioVenta  sql.NullFloat64 `db:"precio_venta"`
+	StockActual  sql.NullInt32   `db:"stock_actual"`
+	StockMinimo  sql.NullInt32   `db:"stock_minimo"`
+	UnidadMedida sql.NullString  `db:"unidad_medida"`
+	EsInsumo     sql.NullBool    `db:"es_insumo"`
 }
 
 func (a *articuloInsumoDB) toArticuloInsumo() domain.ArticuloInsumo {
 	return domain.ArticuloInsumo{
 		ID:           a.ID,
 		Denominacion: database.ToStringP(a.Denominacion),
-		PrecioCompra: a.PrecioCompra,
-		PrecioVenta:  a.PrecioVenta,
-		StockActual:  a.StockActual,
-		StockMinimo:  a.StockMinimo,
+		PrecioCompra: database.ToFloat64P(a.PrecioCompra),
+		PrecioVenta:  database.ToFloat64P(a.PrecioVenta),
+		StockActual:  database.ToIntP(a.StockActual),
+		StockMinimo:  database.ToIntP(a.StockMinimo),
 		UnidadMedida: database.ToStringP(a.UnidadMedida),
 		EsInsumo:     database.ToBoolP(a.EsInsumo),
 	}
@@ -61,7 +61,7 @@ func NewMySQLArticuloInsumoRepository() *MySQLArticuloInsumoRepository {
 
 func (i *MySQLArticuloInsumoRepository) Insert(ctx context.Context, tx *sqlx.Tx, art domain.ArticuloInsumo) error {
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.UnidadMedida, art.EsInsumo)
+	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.EsInsumo)
 	return err
 }
 
