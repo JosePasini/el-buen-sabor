@@ -54,6 +54,7 @@ func (c *ArticuloInsumoController) GetByID(ctx *gin.Context) {
 	}
 	ctx.JSON(200, articuloInsumo)
 }
+
 func (c *ArticuloInsumoController) GetAll(ctx *gin.Context) {
 	articulos, err := c.service.GetAll(ctx)
 	if err != nil {
@@ -62,6 +63,7 @@ func (c *ArticuloInsumoController) GetAll(ctx *gin.Context) {
 	}
 	ctx.JSON(200, articulos)
 }
+
 func (c *ArticuloInsumoController) AddArticuloInsumo(ctx *gin.Context) {
 	var articuloInsumo domain.ArticuloInsumo
 

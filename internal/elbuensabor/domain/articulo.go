@@ -6,9 +6,11 @@ type ArticuloInsumo struct {
 }
 
 type ArticuloManufacturadoDetalle struct {
-	ID int `json:"id"`
+	ID           int    `json:"id"`
+	UnidadMedida string `json:"unidad_medida"`
 }
 
 type ArticuloManufacturado struct {
-	ID int `json:"id"`
+	ID           int     `json:"id"`
+	Denominacion *string `json:"denominacion"`
 }
