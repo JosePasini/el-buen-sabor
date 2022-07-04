@@ -51,7 +51,7 @@ type MySQLArticuloInsumoRepository struct {
 
 func NewMySQLArticuloInsumoRepository() *MySQLArticuloInsumoRepository {
 	return &MySQLArticuloInsumoRepository{
-		qInsert:     "INSERT INTO articulo_insumo (denominacion) VALUES (?)",
+		qInsert:     "INSERT INTO articulo_insumo (denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo) VALUES (?,?,?,?,?,?,?)",
 		qGetByID:    "SELECT id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo FROM articulo_insumo WHERE id = ?",
 		qGetAll:     "SELECT id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo FROM articulo_insumo",
 		qDeleteById: "DELETE FROM articulo_insumo WHERE id = ?",

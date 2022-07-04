@@ -41,7 +41,7 @@ type MySQLArticuloManufacturadoDetalleRepository struct {
 
 func NewMySQLArticuloManufacturadoDetalleRepository() *MySQLArticuloManufacturadoDetalleRepository {
 	return &MySQLArticuloManufacturadoDetalleRepository{
-		qInsert:     "INSERT INTO articulo_manufacturado_detalle (unidad_medida) VALUES (?)",
+		qInsert:     "INSERT INTO articulo_manufacturado_detalle (unidad_medida, id_articulo_insumo, id_articulo_manufacturado) VALUES (?,?,?)",
 		qGetByID:    "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle WHERE id = ?",
 		qGetAll:     "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle",
 		qDeleteById: "DELETE FROM articulo_manufacturado_detalle WHERE id = ?",
