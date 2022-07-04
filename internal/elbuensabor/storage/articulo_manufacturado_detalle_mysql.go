@@ -41,11 +41,11 @@ type MySQLArticuloManufacturadoDetalleRepository struct {
 
 func NewMySQLArticuloManufacturadoDetalleRepository() *MySQLArticuloManufacturadoDetalleRepository {
 	return &MySQLArticuloManufacturadoDetalleRepository{
-		qInsert:     "INSERT INTO articulo_manufacturado_detalle (unidad_medida, id_articulo_insumo, id_articulo_manufacturado) VALUES (?,?,?)",
+		qInsert:     "INSERT INTO articulo_manufacturado_detalle (cantidad, id_articulo_insumo, id_articulo_manufacturado) VALUES (?,?,?)",
 		qGetByID:    "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle WHERE id = ?",
 		qGetAll:     "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle",
 		qDeleteById: "DELETE FROM articulo_manufacturado_detalle WHERE id = ?",
-		qUpdate:     "UPDATE articulo_manufacturado_detalle SET cantidad = COALESCE(?,cantidad) WHERE id = ?",
+		qUpdate:     "UPDATE articulo_manufacturado_detalle SET cantidad = COALESCE(?,cantidad), id_articulo_manufacturado = COALESCE(?,id_articulo_manufacturado),id_articulo_insumo = COALESCE(?,id_articulo_insumo) WHERE id = ?",
 	}
 }
 func (i *MySQLArticuloManufacturadoDetalleRepository) Update(ctx context.Context, tx *sqlx.Tx, artManu domain.ArticuloManufacturadoDetalle) error {
