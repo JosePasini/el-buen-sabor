@@ -11,7 +11,7 @@ import (
 
 type articuloManufacturadoDB struct {
 	ID                   int             `db:"id"`
-	TiempoEstimadoCocina sql.NullString  `db:"tiempo_estimado_cocina"`
+	TiempoEstimadoCocina sql.NullInt32   `db:"tiempo_estimado_cocina"`
 	Denominacion         sql.NullString  `db:"denominacion"`
 	PrecioVenta          sql.NullFloat64 `db:"precio_venta"`
 	Imagen               sql.NullString  `db:"imagen"`
@@ -20,7 +20,7 @@ type articuloManufacturadoDB struct {
 func (a *articuloManufacturadoDB) toArticuloManufacturado() domain.ArticuloManufacturado {
 	return domain.ArticuloManufacturado{
 		ID:                   a.ID,
-		TiempoEstimadoCocina: database.ToStringP(a.TiempoEstimadoCocina),
+		TiempoEstimadoCocina: database.ToIntP(a.TiempoEstimadoCocina),
 		Denominacion:         database.ToStringP(a.Denominacion),
 		PrecioVenta:          database.ToFloat64P(a.PrecioVenta),
 		Imagen:               database.ToStringP(a.Imagen),
