@@ -20,7 +20,7 @@ type ArticuloManufacturadoDetalle struct {
 
 type ArticuloManufacturado struct {
 	ID                   int      `json:"id"`
-	TiempoEstimadoCocina *string  `json:"tiempo_estimado_cocina"`
+	TiempoEstimadoCocina *int     `json:"tiempo_estimado_cocina"`
 	Denominacion         *string  `json:"denominacion"`
 	PrecioVenta          *float64 `json:"precio_venta"`
 	Imagen               *string  `json:"imagen"`
