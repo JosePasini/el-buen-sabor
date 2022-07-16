@@ -6,12 +6,14 @@ import (
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/app"
 	"github.com/gin-gonic/gin"
+	"github.com/subosito/gotenv"
 )
 
 func main() {
 
 	port := os.Getenv("PORT")
-
+	gotenv.Load()
+	fmt.Println("BD", os.Getenv("DB_HOST"))
 	if port == "" {
 		port = "8080"
 	}
