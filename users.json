@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1161703690,
+        "nickname": "TESTUNC7I7LE",
+        "email": "test_user_33418589@testuser.com",
+        "password": "qatest1992",
+        "site_status": "active",
+        "site_id": "MLA",
+        "description": "a description",
+        "date_created": "2022-07-16T01:22:18-04:00",
+        "date_last_updated": "2022-07-16T01:22:18-04:00"
+    },
+    {
+        "id": "",
+        "nickname": "TEST8442GOIA",
+        "password": "qatest5214"
+    },
+    {
+        "id": "",
+        "nickname": "TETE6547350",
+        "password": "qatest1731",
+        "email":"test_user_53114826@testuser.com"
+    },
+    {
+        "public_key": "APP_USR-29ef0b9e-efff-4920-bc8e-357852b93c50",
+        "access_token": "APP_USR-6122869256335299-071610-1c1d8bed277d57cdab12583fb9cab375-1161703690",
+        "client_id": "6122869256335299",
+        "client_secret": "4SqAF6F7nw7NU04VZUD6dtPjviHnGhTR"
+    }
+]

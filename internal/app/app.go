@@ -35,8 +35,8 @@ type App struct {
 }
 
 func NewApp() (*App, error) {
-	scope := ("prod")
-	//scope := ("dev")
+	//scope := ("prod")
+	scope := ("dev")
 
 	config, err := NewConfig(scope)
 	if err != nil {
@@ -75,8 +75,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE"},
-		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers"},
+		AllowMethods: []string{"POST", "PUT", "PATCH", "DELETE", "GET"},
+		AllowHeaders: []string{"Content-Type,access-control-allow-origin, access-control-allow-headers, access-control-allow-credentials"},
 	}))
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -94,6 +94,11 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	{
 		login.POST("", app.LoginController.LoginUsuario)
 	}
+
+	// mercado pago API - test
+	mercadopago := router.Group("/mercado-pago")
+	mercadopago.POST("/pagar", app.FacturaController.MercadoPago)
+	mercadopago.GET("/metodos-de-pago", app.FacturaController.MetodosDePago)
 
 	usuarios := router.Group("/usuarios")
 	{
