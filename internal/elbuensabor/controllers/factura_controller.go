@@ -197,9 +197,9 @@ func (c *FacturaController) MercadoPago(ctx *gin.Context) {
 	}
 	fmt.Println("clienteMP", clienteMP)
 	BACK_URL_MP := mercadopago.BackUrls{
-		Success: "localhost:3000/pedir",
-		Pending: "localhost:3000/pedir",
-		Failure: "localhost:3000/pedir",
+		Success: "https://frontprueba.herokuapp.com/pedir",
+		Pending: "https://frontprueba.herokuapp.com/pedir",
+		Failure: "https://frontprueba.herokuapp.com/pedir",
 	}
 
 	paymentResponse, mercadopagoErr, err := mercadopago.CreatePayment(mercadopago.PaymentRequest{
