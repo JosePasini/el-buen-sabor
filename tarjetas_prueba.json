@@ -1,0 +1,29 @@
+[
+    {
+        "tarjeta": "Visa",
+        "numero": "4509 9535 6623 3704",
+        "codigo_seguridad": 123,
+        "fecha_caducidad": "11/25",
+        "estado_pago": "APRO",
+        "nombre_titular": "APRO"
+    },
+    {
+        "tarjeta": "Mastercard",
+        "numero": "5031 7557 3453 0604",
+        "codigo_seguridad": 123,
+        "fecha_caducidad": "11/25",
+        "estado_pago": "APRO",
+        "nombre_titular": "APRO"
+    },
+    {
+        "tarjeta": "American Express",
+        "numero": "3711 803032 57522",
+        "codigo_seguridad": 123,
+        "fecha_caducidad": "11/25",
+        "estado_pago": "APRO",
+        "nombre_titular": "APRO"
+    },
+    {
+        "usuario_vendedor":"test_user_53114826@testuser.com"
+    }
+]
