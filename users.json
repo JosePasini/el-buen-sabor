@@ -13,7 +13,8 @@
     {
         "id": "",
         "nickname": "TEST8442GOIA",
-        "password": "qatest5214"
+        "password": "qatest5214",
+        "email":"test_user_61796796@testuser.com"
     },
     {
         "id": "",
@@ -26,5 +27,16 @@
         "access_token": "APP_USR-6122869256335299-071610-1c1d8bed277d57cdab12583fb9cab375-1161703690",
         "client_id": "6122869256335299",
         "client_secret": "4SqAF6F7nw7NU04VZUD6dtPjviHnGhTR"
+    },
+    {
+        "id": 1162740875,
+        "nickname": "TESTIWT86GXG",
+        "password": "qatest5894",
+        "email":"est_user_12286574@testuser.com",
+        "site_status": "active",
+        "site_id": "MLA",
+        "description": "a description",
+        "date_created": "2022-07-18T09:03:27-04:00",
+        "date_last_updated": "2022-07-18T09:03:27-04:00"
     }
 ]

@@ -150,10 +150,6 @@ func (c *FacturaController) UpdateFactura(ctx *gin.Context) {
 }
 
 func (c *FacturaController) MercadoPago(ctx *gin.Context) {
-	//TOKEN := os.Getenv("TOKEN_MERCADOPAGO")
-	//TOKEN_PROD := os.Getenv("TOKEN_MERCADOPAGO_PROD")
-	//TOKEN_EL_BUEN_SABOR_PROD := os.Getenv("TOKEN_EL_BUEN_SABOR_PROD")
-
 	TOKEN_EL_BUEN_SABOR_TEST := os.Getenv("TOKEN_EL_BUEN_SABOR_TEST")
 
 	type RequestMercadoPago struct {
@@ -190,30 +186,27 @@ func (c *FacturaController) MercadoPago(ctx *gin.Context) {
 		itemsMercadoPago = append(itemsMercadoPago, itemMP)
 	}
 	clienteMP := mercadopago.Payer{
+		// El email tiene que ser de test y matchear con una cuenta de MP TEST, sino no funciona.
+		// Email: "test_user_53114826@testuser.com",
 		Email: cliente.Email,
 		Name:  cliente.Nombre,
-		Identification: mercadopago.PayerIdentification{
-			Type:   cliente.TypeIdentification,
-			Number: cliente.NumberIdentification,
-		},
+		// Identification: mercadopago.PayerIdentification{
+		// 	Type:   cliente.TypeIdentification,
+		// 	Number: cliente.NumberIdentification,
+		// },
 	}
 	fmt.Println("clienteMP", clienteMP)
 	BACK_URL_MP := mercadopago.BackUrls{
-		Success: "localhost:8080/inicio",
-		Pending: "localhost:8080/inicio",
-		Failure: "localhost:8080/inicio",
+		Success: "localhost:3000/pedir",
+		Pending: "localhost:3000/pedir",
+		Failure: "localhost:3000/pedir",
 	}
-	fmt.Println("itemsMercadoPago", itemsMercadoPago)
-	fmt.Println("Token:", TOKEN_EL_BUEN_SABOR_TEST)
+
 	paymentResponse, mercadopagoErr, err := mercadopago.CreatePayment(mercadopago.PaymentRequest{
-		//ExternalReference: "seu-id-interno-0001",
-		//ExternalReference: "APP_USR-29ef0b9e-efff-4920-bc8e-357852b93c50",
-		//ExternalReference: "TEST-1a914510-1257-45d4-b8ab-73ee7392e021",
-		Items: itemsMercadoPago,
-		//Payer:             clienteMP,
-		BackUrls:        BACK_URL_MP,
-		NotificationURL: "https://localhost/webhook/mercadopago",
-		AutoReturn:      "approved",
+		Items:      itemsMercadoPago,
+		Payer:      clienteMP,
+		BackUrls:   BACK_URL_MP,
+		AutoReturn: "approved",
 	}, TOKEN_EL_BUEN_SABOR_TEST)
 
 	if err != nil {
@@ -231,8 +224,6 @@ func (c *FacturaController) MercadoPago(ctx *gin.Context) {
 }
 
 func (c *FacturaController) MetodosDePago(ctx *gin.Context) {
-	//TOKEN := os.Getenv("TOKEN_MERCADOPAGO")
-	//TOKEN_PROD := os.Getenv("TOKEN_MERCADOPAGO_PROD")
 	TOKEN_EL_BUEN_SABOR_TEST := os.Getenv("TOKEN_EL_BUEN_SABOR_TEST")
 
 	//identificationTypes, mercadopagoErr, err := mercadopago.GetIdentificationTypes(TOKEN_EL_BUEN_SABOR_TEST)
