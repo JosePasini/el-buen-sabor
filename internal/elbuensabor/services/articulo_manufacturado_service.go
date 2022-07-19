@@ -13,6 +13,7 @@ import (
 
 type IArticuloManufacturadoService interface {
 	GetAll(context.Context) ([]domain.ArticuloManufacturado, error)
+	GetAllAvailable(context.Context) (map[string][]domain.ArticuloManufacturadoAvailable, error)
 	GetByID(context.Context, int) (*domain.ArticuloManufacturado, error)
 	UpdateArticuloManufacturado(context.Context, domain.ArticuloManufacturado) error
 	DeleteArticuloManufacturado(context.Context, int) error
@@ -36,6 +37,33 @@ func (i *ArticuloManufacturadoService) GetAll(ctx context.Context) ([]domain.Art
 		return err
 	})
 	return articulosManufacturados, err
+}
+
+func (i *ArticuloManufacturadoService) GetAllAvailable(ctx context.Context) (map[string][]domain.ArticuloManufacturadoAvailable, error) {
+	var err error
+	var bandera bool = false
+	var articulosManufacturadosAvailable []*domain.ArticuloManufacturadoAvailable
+	articulosMap := make(map[string][]domain.ArticuloManufacturadoAvailable)
+
+	err = i.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		articulosManufacturadosAvailable, err = i.repository.GetAllAvailable(ctx, tx)
+		return err
+	})
+
+	for _, articulo := range articulosManufacturadosAvailable {
+		if *articulo.CantidadNecesaria > *articulo.StockActual {
+			articulo.Disponible = &bandera
+		}
+		key, exists := articulosMap[*articulo.ArticuloManufacturado]
+		if exists {
+			key = append(key, *articulo)
+		} else {
+			key = []domain.ArticuloManufacturadoAvailable{*articulo}
+		}
+		articulosMap[*articulo.ArticuloManufacturado] = key
+	}
+
+	return articulosMap, err
 }
 
 func (i *ArticuloManufacturadoService) GetByID(ctx context.Context, id int) (*domain.ArticuloManufacturado, error) {

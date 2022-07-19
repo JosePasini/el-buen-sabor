@@ -25,3 +25,14 @@ type ArticuloManufacturado struct {
 	PrecioVenta          *float64 `json:"precio_venta"`
 	Imagen               *string  `json:"imagen"`
 }
+
+type ArticuloManufacturadoAvailable struct {
+	CantidadNecesaria     *int     `json:"cantidad_necesaria"`
+	UnidadMedida          *string  `json:"unidad_medida"`
+	Insumo                *string  `json:"insumo"`
+	StockActual           *int     `json:"stock_actual"`
+	ArticuloManufacturado *string  `json:"articulo_manufacturado"`
+	TiempoEstimadoCocina  *int     `json:"tiempo_estimado_cocina"`
+	PrecioVenta           *float64 `json:"precio_venta"`
+	Disponible            *bool    `json:"disponible" default:"true"`
+}

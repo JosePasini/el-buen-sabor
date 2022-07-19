@@ -13,6 +13,7 @@ import (
 type IArticuloManufacturadoController interface {
 	GetByID(*gin.Context)
 	GetAll(*gin.Context)
+	GetAllAvailable(*gin.Context)
 	AddArticuloManufacturado(*gin.Context)
 	UpdateArticuloManufacturado(*gin.Context)
 	DeleteArticuloManufacturado(*gin.Context)
@@ -57,6 +58,15 @@ func (c *ArticuloManufacturadoController) GetByID(ctx *gin.Context) {
 
 func (c *ArticuloManufacturadoController) GetAll(ctx *gin.Context) {
 	articulosManufacturados, err := c.service.GetAll(ctx)
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, articulosManufacturados)
+}
+
+func (c *ArticuloManufacturadoController) GetAllAvailable(ctx *gin.Context) {
+	articulosManufacturados, err := c.service.GetAllAvailable(ctx)
 	if err != nil {
 		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
 		return

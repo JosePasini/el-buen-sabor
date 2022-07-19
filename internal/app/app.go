@@ -151,6 +151,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		articuloManufacturado.GET("/getAll", app.ArticuloManufacturadoController.GetAll)
 		articuloManufacturado.DELETE("/:id", app.ArticuloManufacturadoController.DeleteArticuloManufacturado)
 		articuloManufacturado.PUT("", app.ArticuloManufacturadoController.UpdateArticuloManufacturado)
+		articuloManufacturado.GET("/getAllAvailable", app.ArticuloManufacturadoController.GetAllAvailable)
 	}
 
 }
