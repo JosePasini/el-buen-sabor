@@ -24,3 +24,17 @@ type UsuarioMercadoPago struct {
 	TypeIdentification   string `json:"type_identification"`
 	NumberIdentification string `json:"number_identification"`
 }
+
+type DetallePedido struct {
+	ID                      int     `json:"id"`
+	Cantidad                int     `json:"cantidad"`
+	Subtotal                float64 `json:"subtotal"`
+	IdArticuloManufacturado int     `json:"id_articulo_manufacturado"`
+	IdArticuloInsumo        int     `json:"id_articulo_insumo"`
+	IdPedido                int     `json:"id_pedido"`
+}
+
+type GenerarPedido struct {
+	Pedido        Pedido          `json:"pedido"`
+	DetallePedido []DetallePedido `json:"detalle_pedido"`
+}

@@ -46,7 +46,7 @@ type MySQLInstrumentoRepository struct {
 
 func NewMySQLInstrumentoRepository() *MySQLInstrumentoRepository {
 	return &MySQLInstrumentoRepository{
-		qInsert:     "INSERT INTO factura (fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo) VALUES (?,?,?,?,?,?,?)",
+		qInsert:     "INSERT INTO factura (fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo) VALUES (now(),?,?,?,?,?,?)",
 		qGetByID:    "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura WHERE id = ?",
 		qGetAll:     "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura",
 		qDeleteById: "DELETE FROM factura WHERE id = ?",

@@ -17,20 +17,32 @@ CREATE TABLE `elbuensabor`.`usuarios` (
     UNIQUE (usuario, email)
 );
 
-DROP TABLE IF EXISTS `elbuensabor`.`pedidos`;
+DROP TABLE IF EXISTS pedidos;
 
-CREATE TABLE `elbuensabor`.`pedidos` (
+CREATE TABLE pedidos (
     `id` bigint NOT NULL AUTO_INCREMENT,
-    `id_cliente` INT(255),
-    `fecha` DATETIME,
-    `domicilio_envio` VARCHAR(255),
+    `estado` INT,
+    `hora_estimada_fin` DATETIME,
     `detalle_envio` VARCHAR(255),
-    `delivery` BOOLEAN,
-    `metodo_pago` ENUM('efectivo', 'mercadopago'),
+    `tipo_envio` INT,
+    `total` FLOAT,
+    `id_domicilio` INT,
     PRIMARY KEY (`id`)
 );
 
-DROP TABLE IF EXISTS pedidos;
+DROP TABLE IF EXISTS detalle_pedidos;
+
+CREATE TABLE detalle_pedidos (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cantidad` INT,
+    `subtotal` FLOAT,
+    `id_articulo_manufacturado` INT,
+    `id_articulo_insumo` INT,
+    `id_pedido` INT,
+    PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS factura;
 
 CREATE TABLE `elbuensabor`.`factura` (
     `id` bigint NOT NULL AUTO_INCREMENT,

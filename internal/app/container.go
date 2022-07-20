@@ -22,7 +22,7 @@ type Container struct {
 	// Repositorys
 	InstrumentoRepository                  domain.IFacturaRepository
 	LoginRepository                        domain.ILoginRepository
-	PedidoRepository                       domain.IPedidoRepository
+	PedidoRepository                       storage.IPedidoRepository
 	ArticuloManufacturadoDetalleRepository storage.IArticuloManufacturadoDetalleRepository
 	ArticuloManufacturadoRepository        storage.IArticuloManufacturadoRepository
 	ArticuloInsumoRepository               storage.IArticuloInsumoRepository

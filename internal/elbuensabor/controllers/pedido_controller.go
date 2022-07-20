@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"strconv"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -13,6 +16,8 @@ type IPedidoController interface {
 	GetByID(*gin.Context)
 	GetAll(*gin.Context)
 	AddPedido(*gin.Context)
+	AceptarPedido(*gin.Context)
+	GenerarPedido(*gin.Context)
 	UpdatePedido(*gin.Context)
 	DeletePedido(*gin.Context)
 }
@@ -27,11 +32,6 @@ func NewPedidoController(service services.IPedidoService) *PedidoController {
 
 func (c PedidoController) GetByID(ctx *gin.Context) {
 	pedidoID := ctx.Param("idPedido")
-
-	if pedidoID == "" {
-		ctx.JSON(400, errors.New("invalid pedido"))
-		return
-	}
 
 	ID, err := strconv.Atoi(pedidoID)
 	if err != nil {
@@ -63,6 +63,54 @@ func (c PedidoController) GetAll(ctx *gin.Context) {
 	ctx.JSON(200, pedidos)
 }
 
+func (c PedidoController) GenerarPedido(ctx *gin.Context) {
+	var pedido domain.GenerarPedido
+
+	fmt.Println("1")
+
+	body, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		ctx.AbortWithError(400, err)
+		return
+	}
+
+	err = json.Unmarshal(body, &pedido)
+	if err != nil {
+		ctx.AbortWithError(400, err)
+		return
+	}
+
+	fmt.Println("2")
+	fmt.Println(pedido)
+	pedido, err = c.service.GenerarPedido(ctx, pedido)
+	if err != nil {
+		ctx.JSON(400, errors.New("generate pedido error"))
+		return
+	}
+	fmt.Println("3")
+
+	ctx.JSON(200, gin.H{"status": 200, "pedido": pedido})
+}
+
+func (c PedidoController) AceptarPedido(ctx *gin.Context) {
+	fmt.Println(" -- principio --")
+	idParam := ctx.Param("idPedido")
+
+	fmt.Println(idParam)
+	idPedido, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("add pedido error"))
+		return
+	}
+	ok, err := c.service.AceptarPedido(ctx, idPedido)
+	if err != nil || !ok {
+		ctx.JSON(400, errors.New("aceptar pedido error"))
+		return
+	}
+	fmt.Println(" -- fin -- ")
+	ctx.JSON(200, gin.H{"status": 200, "ok": ok})
+}
+
 func (c PedidoController) AddPedido(ctx *gin.Context) {
 	var pedido domain.Pedido
 	err := ctx.BindJSON(&pedido)
@@ -78,6 +126,7 @@ func (c PedidoController) AddPedido(ctx *gin.Context) {
 	}
 	ctx.JSON(200, gin.H{"status": 200, "pedido": pedido})
 }
+
 func (c PedidoController) UpdatePedido(ctx *gin.Context) {
 	var pedido domain.Pedido
 

@@ -100,6 +100,10 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	mercadopago.POST("/pagar", app.FacturaController.MercadoPago)
 	mercadopago.GET("/metodos-de-pago", app.FacturaController.MetodosDePago)
 
+	pedido := router.Group("")
+	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
+	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
+
 	usuarios := router.Group("/usuarios")
 	{
 		usuarios.GET("", app.LoginController.GetAllUsuarios)
