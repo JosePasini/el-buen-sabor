@@ -145,7 +145,7 @@ func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx,
 	}
 	var descontarStockList []DescontarStockQuery
 
-	query := `SELECT ai.id AS articulo_insumo_id, dp.cantidad AS cantidad_pedida, amd.cantidad AS cantidad_insumo FROM pedidos p
+	query := `SELECT distinct(ai.id) AS articulo_insumo_id, dp.cantidad AS cantidad_pedida, amd.cantidad AS cantidad_insumo FROM pedidos p
 					JOIN detalle_pedidos dp ON dp.id_pedido = p.id
 					JOIN articulo_manufacturado am ON am.id = dp.id_articulo_manufacturado
 					JOIN articulo_manufacturado_detalle amd ON amd.id_articulo_manufacturado = am.id
@@ -173,6 +173,9 @@ func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx,
 
 	// Actualizamos el stock del articulo insumo, stock_actual menos la cantidad de insumo utilizado por la cantidad de productos manufacturados pedidos
 	//queryDescontarStock := "UPDATE articulo_insumo SET stock_actual = (stock_actual - CantidadInsumo * CantidadPedida) WHERE IDArticuloInsumo = ?"
+
+	fmt.Println("?", descontarStockList)
+	return false, err
 
 	for _, des := range descontarStockList {
 		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = (stock_actual - (", strconv.Itoa(des.CantidadInsumo),
