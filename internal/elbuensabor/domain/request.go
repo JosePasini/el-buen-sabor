@@ -34,7 +34,12 @@ type DetallePedido struct {
 	IdPedido                int     `json:"id_pedido"`
 }
 
+// type GenerarPedido struct {
+// 	Pedido        Pedido          `json:"pedido"`
+// 	DetallePedido []DetallePedido `json:"detalle_pedido"`
+// }
+
 type GenerarPedido struct {
-	Pedido        Pedido          `json:"pedido"`
-	DetallePedido []DetallePedido `json:"detalle_pedido"`
+	Pedido        Pedido            `json:"pedido"`
+	DetallePedido []CarritoCompleto `json:"detalle_pedido"`
 }

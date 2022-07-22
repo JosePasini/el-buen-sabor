@@ -47,6 +47,8 @@ subtotal: null
 // select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;
 type CarritoCompleto struct {
 	ID                   int      `json:"id"`
+	IDPedido             int      `json:"id_pedido"`
+	SubTotal             float64  `json:"sub_total"`
 	Denominacion         *string  `json:"denominacion"`
 	PrecioCompra         *float64 `json:"precio_compra"`
 	PrecioVenta          *float64 `json:"precio_venta"`

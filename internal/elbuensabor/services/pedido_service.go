@@ -100,9 +100,9 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		// insertamos todos los detalles con el ID de pedido.
 		if len(detallePedido) > 0 {
 			for _, detalle := range detallePedido {
-				detalle.IdPedido = idPedido
+				detalle.IDPedido = idPedido
 				err = s.repository.InsertDetallePedido(ctx, tx, detalle)
-				total += int(detalle.Subtotal) * detalle.Cantidad
+				total += int(detalle.SubTotal) * detalle.Cantidad
 				if err != nil {
 					return err
 				}

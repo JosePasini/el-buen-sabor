@@ -15,7 +15,8 @@ import (
 
 type IPedidoRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) (int, error)
-	InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, detalle_pedido domain.DetallePedido) error
+	//InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, detalle_pedido domain.DetallePedido) error
+	InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, carrito_completo domain.CarritoCompleto) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.Pedido, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Pedido, error)
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
@@ -130,10 +131,23 @@ func (i *MySQLPedidoRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]doma
 	return pedidos, nil
 }
 
-func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, det_pedido domain.DetallePedido) error {
-	query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_manufacturado, id_articulo_insumo, id_pedido) VALUES (?,?,?,?,?)"
-	_, err := tx.ExecContext(ctx, query, det_pedido.Cantidad, det_pedido.Subtotal, det_pedido.IdArticuloManufacturado, det_pedido.IdArticuloInsumo, det_pedido.IdPedido)
-	return err
+// func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, det_pedido domain.DetallePedido) error {
+// 	query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_manufacturado, id_articulo_insumo, id_pedido) VALUES (?,?,?,?,?)"
+// 	_, err := tx.ExecContext(ctx, query, det_pedido.Cantidad, det_pedido.Subtotal, det_pedido.IdArticuloManufacturado, det_pedido.IdArticuloInsumo, det_pedido.IdPedido)
+// 	return err
+// }
+
+func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, carrito domain.CarritoCompleto) error {
+	//query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_manufacturado, id_articulo_insumo, id_pedido) VALUES (?,?,?,?,?)"
+	if carrito.EsBebida {
+		query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_insumo, id_pedido) VALUES (?,?,?,?)"
+		_, err := tx.ExecContext(ctx, query, carrito.Cantidad, carrito.SubTotal, carrito.ID, carrito.IDPedido)
+		return err
+	} else {
+		query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_manufacturado, id_pedido) VALUES (?,?,?,?)"
+		_, err := tx.ExecContext(ctx, query, carrito.Cantidad, carrito.SubTotal, carrito.ID, carrito.IDPedido)
+		return err
+	}
 }
 
 func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
