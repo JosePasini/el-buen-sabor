@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -33,10 +34,39 @@ func (a *articuloInsumoDB) toArticuloInsumo() domain.ArticuloInsumo {
 	}
 }
 
+type carritoCompletoDB struct {
+	ID                   int             `db:"id"`
+	Denominacion         sql.NullString  `db:"denominacion"`
+	PrecioCompra         sql.NullFloat64 `db:"precio_compra"`
+	PrecioVenta          sql.NullFloat64 `db:"precio_venta"`
+	Cantidad             sql.NullInt32   `db:"cantidad"`
+	StockActual          sql.NullInt32   `db:"stock_actual"`
+	StockMinimo          sql.NullInt32   `db:"stock_minimo"`
+	Imagen               sql.NullString  `db:"imagen"`
+	EsBebida             bool            `json:"es_bebida"`
+	TiempoEstimadoCocina sql.NullInt32   `db:"tiempo_estimado_cocina"`
+}
+
+func (a *carritoCompletoDB) toCarritoCompleto() domain.CarritoCompleto {
+	return domain.CarritoCompleto{
+		ID:                   a.ID,
+		Denominacion:         database.ToStringP(a.Denominacion),
+		PrecioCompra:         database.ToFloat64P(a.PrecioCompra),
+		PrecioVenta:          database.ToFloat64P(a.PrecioVenta),
+		Cantidad:             0,
+		StockActual:          database.ToIntP(a.StockActual),
+		StockMinimo:          database.ToIntP(a.StockMinimo),
+		Imagen:               database.ToStringP(a.Imagen),
+		EsBebida:             a.EsBebida,
+		TiempoEstimadoCocina: database.ToIntP(a.TiempoEstimadoCocina),
+	}
+}
+
 type IArticuloInsumoRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, articulo_manufacturado_detalle domain.ArticuloInsumo) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.ArticuloInsumo, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.ArticuloInsumo, error)
+	GetAllCarritoCompleto(ctx context.Context, tx *sqlx.Tx) ([]domain.CarritoCompleto, error)
 	Update(ctx context.Context, tx *sqlx.Tx, articulo_manufacturado_detalle domain.ArticuloInsumo) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 }
@@ -96,6 +126,52 @@ func (i *MySQLArticuloInsumoRepository) GetAll(ctx context.Context, tx *sqlx.Tx)
 		articulos = append(articulos, articulo.toArticuloInsumo())
 	}
 	return articulos, nil
+}
+
+func (i *MySQLArticuloInsumoRepository) GetAllCarritoCompleto(ctx context.Context, tx *sqlx.Tx) ([]domain.CarritoCompleto, error) {
+	queryBebidas := `select id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, imagen 
+		FROM articulo_insumo WHERE es_insumo = false AND stock_actual > 0;`
+	carritoCompleto := make([]domain.CarritoCompleto, 0)
+	rows, err := tx.QueryxContext(ctx, queryBebidas)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	fmt.Println(" 111111 :::::::::::::::::")
+
+	var ok bool = true
+	for rows.Next() {
+		var carritoStruct carritoCompletoDB
+		if err := rows.StructScan(&carritoStruct); err != nil {
+			return carritoCompleto, err
+		}
+		carritoStruct.EsBebida = ok
+		carritoCompleto = append(carritoCompleto, carritoStruct.toCarritoCompleto())
+	}
+	fmt.Println(":::::::::::::::::")
+	fmt.Println("Carrito:", carritoCompleto)
+	fmt.Println(":::::::::::::::::")
+
+	// ------------------- Hasta acá la query para traer las bebidas ------------------- //
+	/*
+		queryPlatos := `select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;`
+	*/
+	queryPlatos := `select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;`
+	rows, err = tx.QueryxContext(ctx, queryPlatos)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var carritoStruct carritoCompletoDB
+		if err := rows.StructScan(&carritoStruct); err != nil {
+			return carritoCompleto, err
+		}
+		carritoCompleto = append(carritoCompleto, carritoStruct.toCarritoCompleto())
+	}
+	fmt.Println(":::::::::::::::::")
+	fmt.Println("Carrito:", carritoCompleto)
+	fmt.Println(":::::::::::::::::")
+	return carritoCompleto, nil
 }
 
 func (i *MySQLArticuloInsumoRepository) Update(ctx context.Context, tx *sqlx.Tx, art domain.ArticuloInsumo) error {

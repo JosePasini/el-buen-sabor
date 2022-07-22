@@ -13,6 +13,7 @@ import (
 type IArticuloInsumoController interface {
 	GetByID(*gin.Context)
 	GetAll(*gin.Context)
+	GetAllCarritoCompleto(*gin.Context)
 	AddArticuloInsumo(*gin.Context)
 	UpdateArticuloInsumo(*gin.Context)
 	DeleteArticuloInsumo(*gin.Context)
@@ -57,6 +58,15 @@ func (c *ArticuloInsumoController) GetByID(ctx *gin.Context) {
 
 func (c *ArticuloInsumoController) GetAll(ctx *gin.Context) {
 	articulos, err := c.service.GetAll(ctx)
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, articulos)
+}
+
+func (c *ArticuloInsumoController) GetAllCarritoCompleto(ctx *gin.Context) {
+	articulos, err := c.service.GetAllCarritoCompleto(ctx)
 	if err != nil {
 		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
 		return

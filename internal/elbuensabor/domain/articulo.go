@@ -36,3 +36,24 @@ type ArticuloManufacturadoAvailable struct {
 	PrecioVenta           *float64 `json:"precio_venta"`
 	Disponible            *bool    `json:"disponible" default:"true"`
 }
+
+/*cantidad: null
+id: null
+id_articulo_insumo: null
+id_articulo_manufacturado: null
+subtotal: null
+*/
+// select id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo, imagen from articulo_insumo WHERE es_insumo = false;
+// select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;
+type CarritoCompleto struct {
+	ID                   int
+	Denominacion         *string
+	PrecioCompra         *float64
+	PrecioVenta          *float64
+	Cantidad             int
+	StockActual          *int
+	StockMinimo          *int
+	Imagen               *string
+	EsBebida             bool
+	TiempoEstimadoCocina *int
+}

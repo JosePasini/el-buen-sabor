@@ -87,32 +87,6 @@ func (s *PedidoService) AddPedido(ctx context.Context, pedido domain.Pedido) err
 	return nil
 }
 
-func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, error) {
-	var err error
-	var pedido *domain.Pedido
-	var ok bool = true
-	fmt.Println("Aceptar pedido service")
-	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		// obtengo el pedido por id para comprobar que exista
-		pedido, err = s.repository.GetByID(ctx, tx, idPedido)
-		if err != nil {
-			return errors.New("internal server error")
-		}
-
-		ok, err = s.repository.DescontarStock(ctx, tx, idPedido)
-		if err != nil || !ok {
-			return err
-		}
-		return err
-	})
-	fmt.Println(err)
-	if err != nil {
-		return false, err
-	}
-	fmt.Println("pedido", pedido)
-	return true, nil
-}
-
 func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.GenerarPedido) (domain.GenerarPedido, error) {
 	var err error
 	var pedido = generarPedido.Pedido
@@ -142,6 +116,35 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 	if err != nil {
 		return domain.GenerarPedido{}, err
 	}
-
 	return generarPedido, err
+}
+
+func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, error) {
+	var err error
+	var pedido *domain.Pedido
+	var ok bool = true
+	fmt.Println("Aceptar pedido service")
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		// obtengo el pedido por id para comprobar que exista
+		pedido, err = s.repository.GetByID(ctx, tx, idPedido)
+		if err != nil {
+			return errors.New("internal server error")
+		}
+		// comprueba que el estado del pedido sea 1 :: 'pendiente de aprobacion'
+		if pedido.Estado != 1 {
+			return errors.New("solo se puede aceptar pedidos en estado 'pendiente de aprobacion' :: 1 ")
+		}
+
+		ok, err = s.repository.DescontarStock(ctx, tx, idPedido)
+		if err != nil || !ok {
+			return err
+		}
+		return err
+	})
+	fmt.Println(err)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("pedido", pedido)
+	return true, nil
 }

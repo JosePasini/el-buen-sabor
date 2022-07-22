@@ -104,6 +104,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
 
+	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
+
 	usuarios := router.Group("/usuarios")
 	{
 		usuarios.GET("", app.LoginController.GetAllUsuarios)

@@ -13,6 +13,7 @@ import (
 
 type IArticuloInsumoService interface {
 	GetAll(context.Context) ([]domain.ArticuloInsumo, error)
+	GetAllCarritoCompleto(context.Context) ([]domain.CarritoCompleto, error)
 	GetByID(context.Context, int) (*domain.ArticuloInsumo, error)
 	UpdateArticuloInsumo(context.Context, domain.ArticuloInsumo) error
 	DeleteArticuloInsumo(context.Context, int) error
@@ -68,6 +69,16 @@ func (s *ArticuloInsumoService) GetAll(ctx context.Context) ([]domain.ArticuloIn
 		return err
 	})
 	return articuloInsumo, err
+}
+
+func (s *ArticuloInsumoService) GetAllCarritoCompleto(ctx context.Context) ([]domain.CarritoCompleto, error) {
+	var err error
+	var carritoCompleto []domain.CarritoCompleto
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		carritoCompleto, err = s.repository.GetAllCarritoCompleto(ctx, tx)
+		return err
+	})
+	return carritoCompleto, err
 }
 
 func (s *ArticuloInsumoService) DeleteArticuloInsumo(ctx context.Context, id int) error {

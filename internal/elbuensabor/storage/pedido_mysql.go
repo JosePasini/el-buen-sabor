@@ -137,55 +137,19 @@ func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sql
 }
 
 func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
-	var ok bool = true
-	type DescontarStockQuery struct {
-		IDArticuloInsumo int
-		CantidadPedida   int
-		CantidadInsumo   int
-	}
-	var descontarStockList []DescontarStockQuery
+	var err error
+	var ok bool
 
-	query := `SELECT distinct(ai.id) AS articulo_insumo_id, dp.cantidad AS cantidad_pedida, amd.cantidad AS cantidad_insumo FROM pedidos p
-					JOIN detalle_pedidos dp ON dp.id_pedido = p.id
-					JOIN articulo_manufacturado am ON am.id = dp.id_articulo_manufacturado
-					JOIN articulo_manufacturado_detalle amd ON amd.id_articulo_manufacturado = am.id
-					JOIN articulo_insumo ai ON ai.id = amd.id_articulo_insumo
-					WHERE p.id = ? AND ai.es_insumo = true`
-
-	rows, err := tx.QueryxContext(ctx, query, idPedido)
+	// Descontar stock de los insumos utilizados en los artículos manufacturados
+	ok, err = DescontarStockManufacturado(ctx, tx, idPedido)
 	if err != nil {
 		return !ok, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var articulo_insumo_id, cantidad_insumo, cantidad_pedida int
-		if err := rows.Scan(&articulo_insumo_id, &cantidad_pedida, &cantidad_insumo); err != nil {
-			return !ok, err
-		}
-		descontarStock := DescontarStockQuery{
-			IDArticuloInsumo: articulo_insumo_id,
-			CantidadPedida:   cantidad_pedida,
-			CantidadInsumo:   cantidad_insumo,
-		}
-		descontarStockList = append(descontarStockList, descontarStock)
-	}
-
-	// Actualizamos el stock del articulo insumo, stock_actual menos la cantidad de insumo utilizado por la cantidad de productos manufacturados pedidos
-	//queryDescontarStock := "UPDATE articulo_insumo SET stock_actual = (stock_actual - CantidadInsumo * CantidadPedida) WHERE IDArticuloInsumo = ?"
-
-	fmt.Println("?", descontarStockList)
-	return false, err
-
-	for _, des := range descontarStockList {
-		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = (stock_actual - (", strconv.Itoa(des.CantidadInsumo),
-			" * ", strconv.Itoa(des.CantidadPedida), ")) WHERE id = ", strconv.Itoa(des.IDArticuloInsumo)}
-		queryDescontarStockOk := strings.Join(query_slices, "")
-		fmt.Println("query ::", queryDescontarStockOk)
-		_, err := tx.ExecContext(ctx, queryDescontarStockOk)
-		if err != nil {
-			return !ok, err
-		}
+	// Descontar stock bebidas
+	ok, err = DescontarStockBebidas(ctx, tx, idPedido)
+	if err != nil {
+		return !ok, err
 	}
 
 	// Actualizo el 'estado' del pedido a 2 :: Estado 'aceptado'
@@ -196,5 +160,108 @@ func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx,
 	}
 
 	fmt.Println("Ok", ok)
+	return ok, err
+}
+
+func DescontarStockBebidas(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
+	var ok bool = true
+	type DescontarStockBebidas struct {
+		StockActual int
+		ArticuloID  int
+	}
+	var descontarStockList []DescontarStockBebidas
+
+	// Descontar Stock articulos NO insumo :: Cervezas, gaseosas, etc.
+	queryArticuloInsumo := `SELECT (ai.stock_actual - dp.cantidad) AS stock_actual, ai.id FROM pedidos p
+					JOIN detalle_pedidos dp ON dp.id_pedido = p.id
+					JOIN articulo_insumo ai ON ai.id = dp.id_articulo_insumo
+					WHERE p.id = ? AND ai.es_insumo = false;`
+
+	rows, err := tx.QueryxContext(ctx, queryArticuloInsumo, idPedido)
+	if err != nil {
+		return !ok, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var stock_actual, articulo_id int
+		if err := rows.Scan(&stock_actual, &articulo_id); err != nil {
+			return !ok, err
+		}
+		descontarStock := DescontarStockBebidas{
+			StockActual: stock_actual,
+			ArticuloID:  articulo_id,
+		}
+		descontarStockList = append(descontarStockList, descontarStock)
+	}
+	if err != nil {
+		return !ok, err
+	}
+	fmt.Println("descontarStockList ::", descontarStockList)
+
+	for _, des := range descontarStockList {
+		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = ", strconv.Itoa(des.StockActual), " WHERE id = ", strconv.Itoa(des.ArticuloID)}
+		queryDescontarStock := strings.Join(query_slices, "")
+		fmt.Println("query 2 ::", queryDescontarStock)
+		_, err := tx.ExecContext(ctx, queryDescontarStock)
+		if err != nil {
+			return ok, err
+		}
+	}
+	if err != nil {
+		return !ok, err
+	}
+	return ok, nil
+}
+
+func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
+	var ok bool = true
+	type DescontarStockInsumosQuery struct {
+		IDArticuloInsumo int
+		CantidadPedida   int
+		CantidadInsumo   int
+	}
+
+	var descontarStockList []DescontarStockInsumosQuery
+
+	queryArticuloManufacturado := `SELECT ai.id AS articulo_insumo_id, dp.cantidad AS cantidad_pedida, amd.cantidad AS cantidad_insumo FROM pedidos p
+					JOIN detalle_pedidos dp ON dp.id_pedido = p.id
+					JOIN articulo_manufacturado am ON am.id = dp.id_articulo_manufacturado
+					JOIN articulo_manufacturado_detalle amd ON amd.id_articulo_manufacturado = am.id
+					JOIN articulo_insumo ai ON ai.id = amd.id_articulo_insumo
+					WHERE p.id = ? AND ai.es_insumo = true`
+
+	rows, err := tx.QueryxContext(ctx, queryArticuloManufacturado, idPedido)
+	if err != nil {
+		return !ok, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var articulo_insumo_id, cantidad_insumo, cantidad_pedida int
+		if err := rows.Scan(&articulo_insumo_id, &cantidad_pedida, &cantidad_insumo); err != nil {
+			return !ok, err
+		}
+		descontarStock := DescontarStockInsumosQuery{
+			IDArticuloInsumo: articulo_insumo_id,
+			CantidadPedida:   cantidad_pedida,
+			CantidadInsumo:   cantidad_insumo,
+		}
+		descontarStockList = append(descontarStockList, descontarStock)
+	}
+
+	// Actualizamos el stock del articulo insumo, stock_actual menos la cantidad de insumo utilizado por la cantidad de productos manufacturados pedidos
+	//queryDescontarStock := "UPDATE articulo_insumo SET stock_actual = (stock_actual - CantidadInsumo * CantidadPedida) WHERE IDArticuloInsumo = ?"
+
+	for _, des := range descontarStockList {
+		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = (stock_actual - (", strconv.Itoa(des.CantidadInsumo),
+			" * ", strconv.Itoa(des.CantidadPedida), ")) WHERE id = ", strconv.Itoa(des.IDArticuloInsumo)}
+		queryDescontarStockOk := strings.Join(query_slices, "")
+		fmt.Println("query 1::", queryDescontarStockOk)
+		_, err := tx.ExecContext(ctx, queryDescontarStockOk)
+		if err != nil {
+			return !ok, err
+		}
+	}
 	return ok, err
 }
