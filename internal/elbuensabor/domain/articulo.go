@@ -46,14 +46,14 @@ subtotal: null
 // select id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo, imagen from articulo_insumo WHERE es_insumo = false;
 // select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;
 type CarritoCompleto struct {
-	ID                   int
-	Denominacion         *string
-	PrecioCompra         *float64
-	PrecioVenta          *float64
-	Cantidad             int
-	StockActual          *int
-	StockMinimo          *int
-	Imagen               *string
-	EsBebida             bool
-	TiempoEstimadoCocina *int
+	ID                   int      `json:"id"`
+	Denominacion         *string  `json:"denominacion"`
+	PrecioCompra         *float64 `json:"precio_compra"`
+	PrecioVenta          *float64 `json:"precio_venta"`
+	Cantidad             int      `json:"cantidad"`
+	StockActual          *int     `json:"stock_actual"`
+	StockMinimo          *int     `json:"stock_minimo"`
+	Imagen               *string  `json:"imagen"`
+	EsBebida             bool     `json:"es_bebida"`
+	TiempoEstimadoCocina *int     `json:"tiempo_estimado_cocina"`
 }
