@@ -178,8 +178,11 @@ func (c PedidoController) DeletePedido(ctx *gin.Context) {
 func (c PedidoController) RankingComidasMasPedidas(ctx *gin.Context) {
 	var err error
 	var comidasMasPedidas []domain.RankingComidasMasPedidas
-
-	comidasMasPedidas, err = c.service.RankingComidasMasPedidas(ctx)
+	desde := ctx.Query("desde")
+	hasta := ctx.Query("hasta")
+	fmt.Println("desde", desde)
+	fmt.Println("hasta", hasta)
+	comidasMasPedidas, err = c.service.RankingComidasMasPedidas(ctx, desde, hasta)
 	if err != nil {
 		ctx.JSON(400, errors.New("generate pedido error"))
 		return

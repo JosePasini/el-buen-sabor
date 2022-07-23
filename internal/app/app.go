@@ -107,6 +107,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
 
 	// Rankings ::
+	// Agregar esta validación al repo cuando esté :: (AND p.estado = 'confirmado y pagado')
+
 	router.GET("/ranking-comidas", app.PedidoController.RankingComidasMasPedidas)
 	usuarios := router.Group("/usuarios")
 	{
