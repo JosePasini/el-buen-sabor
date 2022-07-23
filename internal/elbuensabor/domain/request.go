@@ -34,12 +34,12 @@ type DetallePedido struct {
 	IdPedido                int     `json:"id_pedido"`
 }
 
-// type GenerarPedido struct {
-// 	Pedido        Pedido          `json:"pedido"`
-// 	DetallePedido []DetallePedido `json:"detalle_pedido"`
-// }
-
 type GenerarPedido struct {
 	Pedido        Pedido            `json:"pedido"`
 	DetallePedido []CarritoCompleto `json:"detalle_pedido"`
+}
+
+type PedidoEstado struct {
+	IDPedido int `json:"id_pedido"`
+	Estado   int `json:"estado"`
 }

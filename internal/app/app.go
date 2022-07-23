@@ -18,6 +18,9 @@ type App struct {
 	LoginService    services.ILoginService
 	LoginController controllers.ILoginController
 
+	DomicilioService    services.IDomicilioService
+	DomicilioController controllers.IDomicilioController
+
 	PedidoService    services.IPedidoService
 	PedidoController controllers.IPedidoController
 
@@ -67,6 +70,9 @@ func NewApp() (*App, error) {
 
 		ArticuloInsumoService:    container.ArticuloInsumoService,
 		ArticuloInsumoController: controllers.NewArticuloInsumoController(container.ArticuloInsumoService),
+
+		DomicilioService:    container.DomicilioService,
+		DomicilioController: controllers.NewDomicilioController(container.DomicilioService),
 	}
 	return &app, nil
 }
@@ -118,6 +124,14 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		usuarios.PUT("", app.LoginController.UpdateUsuario)
 	}
 
+	domicilio := router.Group("/domicilio")
+	{
+		// domicilio.GET("/:id", app.LoginController.GetDomicilioByID)
+		domicilio.POST("", app.DomicilioController.AddDomicilio)
+		domicilio.PUT("", app.DomicilioController.UpdateDomicilio)
+		// domicilio.DELETE("/:id", app.LoginController.DeleteUsuarioByID)
+	}
+
 	instrumentoGroup := router.Group("/factura")
 	{
 		instrumentoGroup.GET("/:idFactura", app.FacturaController.GetByID)
@@ -134,6 +148,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		productoGroup.GET("/getAll", app.PedidoController.GetAll)
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)
+		productoGroup.PUT("/update-estado", app.PedidoController.UpdateEstado)
 	}
 
 	articuloInsumo := router.Group("/articulo-insumo")

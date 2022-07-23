@@ -90,3 +90,11 @@ CREATE TABLE `elbuensabor`.`articulo_manufacturado` (
     `imagen` VARCHAR(255),
     PRIMARY KEY (`id`)
 );
+
+CREATE TABLE `heroku_9952cf2f0b46460`.`domicilio` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `calle` VARCHAR(255),
+    `numero` INT,
+    `localidad` VARCHAR(255),
+    PRIMARY KEY (`id`)
+);

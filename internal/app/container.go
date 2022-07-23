@@ -18,7 +18,7 @@ type Container struct {
 	ArticuloManufacturadoDetalleService services.IArticuloManufacturadoDetalleService
 	ArticuloManufacturadoService        services.IArticuloManufacturadoService
 	ArticuloInsumoService               services.IArticuloInsumoService
-
+	DomicilioService                    services.IDomicilioService
 	// Repositorys
 	InstrumentoRepository                  domain.IFacturaRepository
 	LoginRepository                        domain.ILoginRepository
@@ -26,6 +26,7 @@ type Container struct {
 	ArticuloManufacturadoDetalleRepository storage.IArticuloManufacturadoDetalleRepository
 	ArticuloManufacturadoRepository        storage.IArticuloManufacturadoRepository
 	ArticuloInsumoRepository               storage.IArticuloInsumoRepository
+	DomicilioRepository                    storage.IDomicilioRepository
 }
 
 func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
@@ -47,6 +48,9 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 	articuloInsumoRepository := storage.NewMySQLArticuloInsumoRepository()
 	articuloInsumoService := services.NewArticuloInsumoService(db, articuloInsumoRepository)
 
+	domicilioRepository := storage.NewMySQLDomicilioRepository()
+	domicilioService := services.NewDomicilioService(db, domicilioRepository)
+
 	return Container{
 		Config:                config,
 		FacturaService:        facturaService,
@@ -66,5 +70,8 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 
 		ArticuloInsumoService:    articuloInsumoService,
 		ArticuloInsumoRepository: articuloInsumoRepository,
+
+		DomicilioService:    domicilioService,
+		DomicilioRepository: domicilioRepository,
 	}
 }

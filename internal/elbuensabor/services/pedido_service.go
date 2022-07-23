@@ -15,6 +15,7 @@ type IPedidoService interface {
 	GetAll(context.Context) ([]domain.Pedido, error)
 	GetByID(context.Context, int) (*domain.Pedido, error)
 	UpdatePedido(context.Context, domain.Pedido) error
+	UpdateEstado(context.Context, int, int) error
 	DeletePedido(context.Context, int) error
 	AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
@@ -58,6 +59,14 @@ func (s *PedidoService) UpdatePedido(ctx context.Context, pedido domain.Pedido) 
 	var err error
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		err = s.repository.Update(ctx, tx, pedido)
+		return err
+	})
+	return err
+}
+func (s *PedidoService) UpdateEstado(ctx context.Context, estado, IDPedido int) error {
+	var err error
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		err = s.repository.UpdateEstado(ctx, tx, estado, IDPedido)
 		return err
 	})
 	return err

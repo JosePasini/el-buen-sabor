@@ -23,6 +23,7 @@ type IPedidoRepository interface {
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error)
+	UpdateEstado(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
 	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error)
 }
 
@@ -70,7 +71,16 @@ func NewMySQLPedidoRepository() *MySQLPedidoRepository {
 
 func (i *MySQLPedidoRepository) Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, pedido.Estado, pedido.HoraEstimadaFin, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente, pedido.ID)
+	_, err := tx.ExecContext(ctx, query, pedido.Estado, pedido.HoraEstimadaFin, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.IDDomicicio, pedido.IDCliente, pedido.ID)
+	return err
+}
+
+func (i *MySQLPedidoRepository) UpdateEstado(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error {
+	query := "UPDATE pedidos SET estado = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, query, estado, IDPedido)
+	fmt.Println("estado:", estado)
+	fmt.Println("IDPedido:", IDPedido)
+	fmt.Println("err:", err)
 	return err
 }
 

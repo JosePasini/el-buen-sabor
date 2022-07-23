@@ -17,6 +17,7 @@ type IPedidoController interface {
 	AceptarPedido(*gin.Context)
 	GenerarPedido(*gin.Context)
 	UpdatePedido(*gin.Context)
+	UpdateEstado(*gin.Context)
 	DeletePedido(*gin.Context)
 	RankingComidasMasPedidas(*gin.Context)
 }
@@ -131,6 +132,28 @@ func (c PedidoController) UpdatePedido(ctx *gin.Context) {
 	}
 
 	err = c.service.UpdatePedido(ctx, pedido)
+	if err != nil {
+		ctx.JSON(500, errors.New("internal error server"))
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"status":  200,
+		"message": "pedido updated successfully",
+	})
+}
+
+func (c PedidoController) UpdateEstado(ctx *gin.Context) {
+	var pedido domain.PedidoEstado
+
+	err := ctx.BindJSON(&pedido)
+
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid pedido to be updated"))
+		return
+	}
+
+	err = c.service.UpdateEstado(ctx, pedido.Estado, pedido.IDPedido)
 	if err != nil {
 		ctx.JSON(500, errors.New("internal error server"))
 		return
