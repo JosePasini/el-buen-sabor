@@ -109,6 +109,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	pedido := router.Group("")
 	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
+	pedido.GET("/detalle-pedido/:idPedido", app.PedidoController.GetAllDetallePedidosByIDPedido)
 
 	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
 
@@ -148,7 +149,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		productoGroup.GET("/getAll", app.PedidoController.GetAll)
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)
-		productoGroup.PUT("/update-estado", app.PedidoController.UpdateEstado)
+		productoGroup.PUT("/update-estado", app.PedidoController.UpdateEstadoPedido)
 	}
 
 	articuloInsumo := router.Group("/articulo-insumo")

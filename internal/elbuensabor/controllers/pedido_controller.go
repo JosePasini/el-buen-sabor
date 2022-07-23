@@ -17,9 +17,10 @@ type IPedidoController interface {
 	AceptarPedido(*gin.Context)
 	GenerarPedido(*gin.Context)
 	UpdatePedido(*gin.Context)
-	UpdateEstado(*gin.Context)
+	UpdateEstadoPedido(*gin.Context)
 	DeletePedido(*gin.Context)
 	RankingComidasMasPedidas(*gin.Context)
+	GetAllDetallePedidosByIDPedido(*gin.Context)
 }
 
 type PedidoController struct {
@@ -56,6 +57,23 @@ func (c PedidoController) GetByID(ctx *gin.Context) {
 
 func (c PedidoController) GetAll(ctx *gin.Context) {
 	pedidos, err := c.service.GetAll(ctx)
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, pedidos)
+}
+func (c PedidoController) GetAllDetallePedidosByIDPedido(ctx *gin.Context) {
+	idParam := ctx.Param("idPedido")
+	fmt.Println("idPedido", idParam)
+	idPedido, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid pedido id"))
+		return
+	}
+	fmt.Println("idPedido", idPedido)
+
+	pedidos, err := c.service.GetAllDetallePedidosByIDPedido(ctx, idPedido)
 	if err != nil {
 		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
 		return
@@ -143,7 +161,7 @@ func (c PedidoController) UpdatePedido(ctx *gin.Context) {
 	})
 }
 
-func (c PedidoController) UpdateEstado(ctx *gin.Context) {
+func (c PedidoController) UpdateEstadoPedido(ctx *gin.Context) {
 	var pedido domain.PedidoEstado
 
 	err := ctx.BindJSON(&pedido)
@@ -153,7 +171,7 @@ func (c PedidoController) UpdateEstado(ctx *gin.Context) {
 		return
 	}
 
-	err = c.service.UpdateEstado(ctx, pedido.Estado, pedido.IDPedido)
+	err = c.service.UpdateEstadoPedido(ctx, pedido.Estado, pedido.IDPedido)
 	if err != nil {
 		ctx.JSON(500, errors.New("internal error server"))
 		return
@@ -211,5 +229,4 @@ func (c PedidoController) RankingComidasMasPedidas(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, comidasMasPedidas)
-	//ctx.JSON(200, gin.H{"status": 200, "Ranking comidas mas pedidas": comidasMasPedidas})
 }

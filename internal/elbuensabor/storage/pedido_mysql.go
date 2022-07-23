@@ -19,11 +19,12 @@ type IPedidoRepository interface {
 	InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, carrito_completo domain.CarritoCompleto) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.Pedido, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Pedido, error)
+	GetAllDetallePedidoByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) ([]domain.DetallePedidoResponse, error)
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error)
-	UpdateEstado(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
+	UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
 	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error)
 }
 
@@ -51,6 +52,24 @@ func (i *pedidoDB) toPedido() domain.Pedido {
 	}
 }
 
+type detallePedidoDB struct {
+	IDPedido     int            `db:"id_pedido"`
+	Cantidad     int            `db:"cantidad"`
+	Subtotal     float64        `db:"subtotal"`
+	Denominacion sql.NullString `db:"denominacion"`
+	Imagen       sql.NullString `db:"imagen"`
+}
+
+func (i *detallePedidoDB) toDetallePedido() domain.DetallePedidoResponse {
+	return domain.DetallePedidoResponse{
+		IDPedido:     i.IDPedido,
+		Cantidad:     i.Cantidad,
+		Subtotal:     i.Subtotal,
+		Denominacion: database.ToStringP(i.Denominacion),
+		Imagen:       database.ToStringP(i.Imagen),
+	}
+}
+
 type MySQLPedidoRepository struct {
 	qInsert     string
 	qGetByID    string
@@ -75,7 +94,7 @@ func (i *MySQLPedidoRepository) Update(ctx context.Context, tx *sqlx.Tx, pedido 
 	return err
 }
 
-func (i *MySQLPedidoRepository) UpdateEstado(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error {
+func (i *MySQLPedidoRepository) UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error {
 	query := "UPDATE pedidos SET estado = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, query, estado, IDPedido)
 	fmt.Println("estado:", estado)
@@ -138,6 +157,48 @@ func (i *MySQLPedidoRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]doma
 			return pedidos, err
 		}
 		pedidos = append(pedidos, pedidoDB.toPedido())
+	}
+	return pedidos, nil
+}
+func (i *MySQLPedidoRepository) GetAllDetallePedidoByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) ([]domain.DetallePedidoResponse, error) {
+
+	queryGetManufacturados := `SELECT dp.id_pedido, dp.cantidad, dp.subtotal, am.denominacion, am.imagen FROM detalle_pedidos dp
+		JOIN articulo_manufacturado am ON am.id = dp.id_articulo_manufacturado
+    	WHERE dp.id_pedido = ?;`
+
+	queryGetBebidas := `SELECT dp.id_pedido,dp.cantidad, dp.subtotal,ai.denominacion, ai.imagen FROM detalle_pedidos dp
+		JOIN articulo_insumo ai ON ai.id = dp.id_articulo_insumo
+		WHERE dp.id_pedido = ? AND ai.es_insumo = false;`
+
+	pedidos := make([]domain.DetallePedidoResponse, 0)
+
+	rows, err := tx.QueryxContext(ctx, queryGetManufacturados, idPedido)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var pedido detallePedidoDB
+		if err := rows.StructScan(&pedido); err != nil {
+			return pedidos, err
+		}
+		pedidos = append(pedidos, pedido.toDetallePedido())
+	}
+
+	rows, err = tx.QueryxContext(ctx, queryGetBebidas, idPedido)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	fmt.Println("antes:::")
+
+	for rows.Next() {
+		var pedido detallePedidoDB
+		if err := rows.StructScan(&pedido); err != nil {
+			return pedidos, err
+		}
+		pedidos = append(pedidos, pedido.toDetallePedido())
 	}
 	return pedidos, nil
 }

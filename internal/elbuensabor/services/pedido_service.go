@@ -15,12 +15,13 @@ type IPedidoService interface {
 	GetAll(context.Context) ([]domain.Pedido, error)
 	GetByID(context.Context, int) (*domain.Pedido, error)
 	UpdatePedido(context.Context, domain.Pedido) error
-	UpdateEstado(context.Context, int, int) error
+	UpdateEstadoPedido(context.Context, int, int) error
 	DeletePedido(context.Context, int) error
 	AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
 	AceptarPedido(context.Context, int) (bool, error)
 	RankingComidasMasPedidas(context.Context, string, string) ([]domain.RankingComidasMasPedidas, error)
+	GetAllDetallePedidosByIDPedido(context.Context, int) ([]domain.DetallePedidoResponse, error)
 }
 
 type PedidoService struct {
@@ -40,6 +41,15 @@ func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
 		return err
 	})
 	return pedidos, err
+}
+func (s *PedidoService) GetAllDetallePedidosByIDPedido(ctx context.Context, idPedido int) ([]domain.DetallePedidoResponse, error) {
+	var err error
+	var detallePedido []domain.DetallePedidoResponse
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		detallePedido, err = s.repository.GetAllDetallePedidoByIDPedido(ctx, tx, idPedido)
+		return err
+	})
+	return detallePedido, err
 }
 
 func (s *PedidoService) GetByID(ctx context.Context, id int) (*domain.Pedido, error) {
@@ -63,10 +73,18 @@ func (s *PedidoService) UpdatePedido(ctx context.Context, pedido domain.Pedido) 
 	})
 	return err
 }
-func (s *PedidoService) UpdateEstado(ctx context.Context, estado, IDPedido int) error {
+
+func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido int) error {
 	var err error
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		err = s.repository.UpdateEstado(ctx, tx, estado, IDPedido)
+
+		pedido, err := s.repository.GetByID(ctx, tx, IDPedido)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("pedido", pedido)
+		err = s.repository.UpdateEstadoPedido(ctx, tx, estado, IDPedido)
 		return err
 	})
 	return err
@@ -167,4 +185,21 @@ func (s *PedidoService) RankingComidasMasPedidas(ctx context.Context, desde, has
 		return err
 	})
 	return rankingComidasMasPedidas, err
+}
+
+func VerificarFlujoEstadoPedido(estadoActual, estadoNuevo int) bool {
+	var ok bool = true
+
+	if estadoActual == 2 {
+		if estadoNuevo == 3 {
+			return ok
+		}
+	}
+
+	if estadoActual == 3 {
+		if estadoNuevo == 4 || estadoNuevo == 6 {
+			return ok
+		}
+	}
+	return !ok
 }
