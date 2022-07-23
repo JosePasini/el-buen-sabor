@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"strconv"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -20,6 +18,7 @@ type IPedidoController interface {
 	GenerarPedido(*gin.Context)
 	UpdatePedido(*gin.Context)
 	DeletePedido(*gin.Context)
+	RankingComidasMasPedidas(*gin.Context)
 }
 
 type PedidoController struct {
@@ -68,20 +67,14 @@ func (c PedidoController) GenerarPedido(ctx *gin.Context) {
 
 	fmt.Println("1")
 
-	body, err := ioutil.ReadAll(ctx.Request.Body)
+	err := ctx.BindJSON(&pedido)
 	if err != nil {
-		ctx.AbortWithError(400, err)
+		ctx.JSON(400, errors.New("generate pedido error"))
 		return
 	}
-
-	err = json.Unmarshal(body, &pedido)
-	if err != nil {
-		ctx.AbortWithError(400, err)
-		return
-	}
-
 	fmt.Println("2")
 	fmt.Println(pedido)
+	fmt.Println(":::", pedido.Pedido)
 	pedido, err = c.service.GenerarPedido(ctx, pedido)
 	if err != nil {
 		ctx.JSON(400, errors.New("generate pedido error"))
@@ -152,13 +145,13 @@ func (c PedidoController) UpdatePedido(ctx *gin.Context) {
 func (c PedidoController) DeletePedido(ctx *gin.Context) {
 	idPedido := ctx.Param("idPedido")
 	if idPedido == "" {
-		ctx.JSON(400, errors.New("invalid instrument"))
+		ctx.JSON(400, errors.New("invalid pedido"))
 		return
 	}
 
 	ID, err := strconv.Atoi(idPedido)
 	if err != nil {
-		ctx.JSON(400, errors.New("id instrument must be a number"))
+		ctx.JSON(400, errors.New("id pedido must be a number"))
 		return
 	}
 
@@ -180,4 +173,17 @@ func (c PedidoController) DeletePedido(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"message": "pedido deleted successfully",
 	})
+}
+
+func (c PedidoController) RankingComidasMasPedidas(ctx *gin.Context) {
+	var err error
+	var comidasMasPedidas []domain.RankingComidasMasPedidas
+
+	comidasMasPedidas, err = c.service.RankingComidasMasPedidas(ctx)
+	if err != nil {
+		ctx.JSON(400, errors.New("generate pedido error"))
+		return
+	}
+	ctx.JSON(200, comidasMasPedidas)
+	//ctx.JSON(200, gin.H{"status": 200, "Ranking comidas mas pedidas": comidasMasPedidas})
 }

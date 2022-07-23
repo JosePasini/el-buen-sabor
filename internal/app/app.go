@@ -106,6 +106,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
 
+	// Rankings ::
+	router.GET("/ranking-comidas", app.PedidoController.RankingComidasMasPedidas)
 	usuarios := router.Group("/usuarios")
 	{
 		usuarios.GET("", app.LoginController.GetAllUsuarios)

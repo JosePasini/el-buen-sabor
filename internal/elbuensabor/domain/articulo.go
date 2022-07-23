@@ -48,7 +48,7 @@ subtotal: null
 type CarritoCompleto struct {
 	ID                   int      `json:"id"`
 	IDPedido             int      `json:"id_pedido"`
-	SubTotal             float64  `json:"sub_total"`
+	SubTotal             float64  `json:"subtotal"`
 	Denominacion         *string  `json:"denominacion"`
 	PrecioCompra         *float64 `json:"precio_compra"`
 	PrecioVenta          *float64 `json:"precio_venta"`

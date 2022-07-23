@@ -23,6 +23,7 @@ type IPedidoRepository interface {
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error)
+	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx) ([]domain.RankingComidasMasPedidas, error)
 }
 
 type pedidoDB struct {
@@ -148,6 +149,51 @@ func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sql
 		_, err := tx.ExecContext(ctx, query, carrito.Cantidad, carrito.SubTotal, carrito.ID, carrito.IDPedido)
 		return err
 	}
+}
+
+func (i *MySQLPedidoRepository) RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx) ([]domain.RankingComidasMasPedidas, error) {
+	query := `SELECT p.id AS id_pedido, SUM(dp.cantidad) AS veces_pedida, dp.id_articulo_manufacturado, am.denominacion from pedidos p 
+				JOIN detalle_pedidos dp on dp.id_pedido = p.id
+    			JOIN articulo_manufacturado am on am.id = dp.id_articulo_manufacturado
+    			WHERE id_articulo_manufacturado IS NOT NULL
+    			AND p.hora_estimada_fin BETWEEN '2010-01-30 14:15:54' AND '2022-01-30 14:15:55'
+    			GROUP BY id_articulo_manufacturado
+    			ORDER BY veces_pedida desc;`
+
+	rankingComidas := make([]domain.RankingComidasMasPedidas, 0)
+
+	rows, err := tx.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		//var pedidoDB pedidoDB
+		var id_pedido, veces_pedida, id_articulo_manufacturado int
+		var denominacion string
+		if err := rows.Scan(&id_pedido, &veces_pedida, &id_articulo_manufacturado, &denominacion); err != nil {
+			return nil, err
+		}
+		rankComidas := domain.RankingComidasMasPedidas{
+			IDPedido:                id_pedido,
+			VecesPedida:             veces_pedida,
+			IDArticuloManufacturado: id_articulo_manufacturado,
+			Denominacion:            denominacion,
+		}
+		rankingComidas = append(rankingComidas, rankComidas)
+	}
+	return rankingComidas, nil
+
+	// var pedido pedidoDB
+
+	// row := tx.QueryRowxContext(ctx, query)
+	// err := row.StructScan(&pedido)
+	// if err != nil {
+	// 	return nil, sql.ErrNoRows
+	// }
+	// inst := pedido.toPedido()
+	// return &inst, nil
 }
 
 func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {

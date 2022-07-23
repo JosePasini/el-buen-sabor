@@ -19,6 +19,7 @@ type IPedidoService interface {
 	AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
 	AceptarPedido(context.Context, int) (bool, error)
+	RankingComidasMasPedidas(context.Context) ([]domain.RankingComidasMasPedidas, error)
 }
 
 type PedidoService struct {
@@ -147,4 +148,14 @@ func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, 
 	}
 	fmt.Println("pedido", pedido)
 	return true, nil
+}
+
+func (s *PedidoService) RankingComidasMasPedidas(ctx context.Context) ([]domain.RankingComidasMasPedidas, error) {
+	var err error
+	var rankingComidasMasPedidas []domain.RankingComidasMasPedidas
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		rankingComidasMasPedidas, err = s.repository.RankingComidasMasPedidas(ctx, tx)
+		return err
+	})
+	return rankingComidasMasPedidas, err
 }
