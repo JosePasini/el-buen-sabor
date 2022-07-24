@@ -23,3 +23,9 @@ type DetallePedidoResponse struct {
 	Denominacion *string `json:"denominacion" db:"denominacion"`
 	Imagen       *string `json:"imagen" db:"imagen"`
 }
+
+type PedidosPorCliente struct {
+	CantidadPedidos int     `json:"cantidad_pedidos" db:"cantidad_pedidos"`
+	IDCliente       int     `json:"id_cliente" db:"id_cliente"`
+	Total           float64 `json:"total" db:"total"`
+}

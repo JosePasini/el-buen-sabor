@@ -22,15 +22,17 @@ type IPedidoService interface {
 	AceptarPedido(context.Context, int) (bool, error)
 	RankingComidasMasPedidas(context.Context, string, string) ([]domain.RankingComidasMasPedidas, error)
 	GetAllDetallePedidosByIDPedido(context.Context, int) ([]domain.DetallePedidoResponse, error)
+	GetPedidosPorClientes(context.Context, string, string) ([]domain.PedidosPorCliente, error)
 }
 
 type PedidoService struct {
-	db         database.DB
-	repository storage.IPedidoRepository
+	db                database.DB
+	repository        storage.IPedidoRepository
+	repositoryFactura domain.IFacturaRepository
 }
 
-func NewPedidoService(db database.DB, repository storage.IPedidoRepository) *PedidoService {
-	return &PedidoService{db, repository}
+func NewPedidoService(db database.DB, repository storage.IPedidoRepository, repositoryFactura domain.IFacturaRepository) *PedidoService {
+	return &PedidoService{db, repository, repositoryFactura}
 }
 
 func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
@@ -42,6 +44,7 @@ func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
 	})
 	return pedidos, err
 }
+
 func (s *PedidoService) GetAllDetallePedidosByIDPedido(ctx context.Context, idPedido int) ([]domain.DetallePedidoResponse, error) {
 	var err error
 	var detallePedido []domain.DetallePedidoResponse
@@ -50,6 +53,16 @@ func (s *PedidoService) GetAllDetallePedidosByIDPedido(ctx context.Context, idPe
 		return err
 	})
 	return detallePedido, err
+}
+
+func (s *PedidoService) GetPedidosPorClientes(ctx context.Context, desde, hasta string) ([]domain.PedidosPorCliente, error) {
+	var err error
+	var pedidosByClient []domain.PedidosPorCliente
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		pedidosByClient, err = s.repository.GetPedidosPorClientes(ctx, tx, desde, hasta)
+		return err
+	})
+	return pedidosByClient, err
 }
 
 func (s *PedidoService) GetByID(ctx context.Context, id int) (*domain.Pedido, error) {
@@ -85,6 +98,33 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 
 		fmt.Println("pedido", pedido)
 		err = s.repository.UpdateEstadoPedido(ctx, tx, estado, IDPedido)
+		if err != nil {
+			return err
+		}
+		var descuento, costo_total float64
+		var hardcodeta string = "hardcodeta"
+		if estado == domain.FACTURADO {
+
+			costo_total, err = s.repository.GetCostoTotalByPedido(ctx, tx, IDPedido)
+			if err != nil {
+				return err
+			}
+			if pedido.TipoEnvio == domain.DELIVERY {
+				descuento = pedido.Total * 0.1
+			}
+			factura := domain.Factura{
+				MontoDescuento: descuento,
+				FormaPago:      &hardcodeta,
+				TotalVenta:     pedido.Total,
+				TotalCosto:     costo_total,
+				IDPedido:       IDPedido,
+			}
+			err = s.repositoryFactura.Insert(ctx, tx, factura)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Factura:", factura)
+		}
 		return err
 	})
 	return err

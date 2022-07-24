@@ -110,13 +110,15 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
 	pedido.GET("/detalle-pedido/:idPedido", app.PedidoController.GetAllDetallePedidosByIDPedido)
+	pedido.PUT("/pedido/update-estado", app.PedidoController.UpdateEstadoPedido)
 
 	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
 
-	// Rankings ::
+	// Rankings :: Excels
 	// Agregar esta validación al repo cuando esté :: (AND p.estado = 'confirmado y pagado')
-
 	router.GET("/ranking-comidas", app.PedidoController.RankingComidasMasPedidas)
+	router.GET("/pedidos-por-cliente", app.PedidoController.GetPedidosPorClientes)
+
 	usuarios := router.Group("/usuarios")
 	{
 		usuarios.GET("", app.LoginController.GetAllUsuarios)
@@ -149,7 +151,6 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		productoGroup.GET("/getAll", app.PedidoController.GetAll)
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)
-		productoGroup.PUT("/update-estado", app.PedidoController.UpdateEstadoPedido)
 	}
 
 	articuloInsumo := router.Group("/articulo-insumo")

@@ -21,6 +21,7 @@ type IPedidoController interface {
 	DeletePedido(*gin.Context)
 	RankingComidasMasPedidas(*gin.Context)
 	GetAllDetallePedidosByIDPedido(*gin.Context)
+	GetPedidosPorClientes(*gin.Context)
 }
 
 type PedidoController struct {
@@ -63,6 +64,7 @@ func (c PedidoController) GetAll(ctx *gin.Context) {
 	}
 	ctx.JSON(200, pedidos)
 }
+
 func (c PedidoController) GetAllDetallePedidosByIDPedido(ctx *gin.Context) {
 	idParam := ctx.Param("idPedido")
 	fmt.Println("idPedido", idParam)
@@ -79,6 +81,20 @@ func (c PedidoController) GetAllDetallePedidosByIDPedido(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, pedidos)
+}
+
+func (c PedidoController) GetPedidosPorClientes(ctx *gin.Context) {
+	desde := ctx.Query("desde")
+	hasta := ctx.Query("hasta")
+	fmt.Println("desde", desde)
+	fmt.Println("hasta", hasta)
+
+	pedidosByIdCLiente, err := c.service.GetPedidosPorClientes(ctx, desde, hasta)
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, pedidosByIdCLiente)
 }
 
 func (c PedidoController) GenerarPedido(ctx *gin.Context) {

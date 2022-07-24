@@ -20,6 +20,8 @@ type IPedidoRepository interface {
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.Pedido, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Pedido, error)
 	GetAllDetallePedidoByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) ([]domain.DetallePedidoResponse, error)
+	GetPedidosPorClientes(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error)
+	GetCostoTotalByPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (float64, error)
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
@@ -203,6 +205,37 @@ func (i *MySQLPedidoRepository) GetAllDetallePedidoByIDPedido(ctx context.Contex
 	return pedidos, nil
 }
 
+func (i *MySQLPedidoRepository) GetPedidosPorClientes(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error) {
+	queryGetManufacturados := `SELECT count(p.id) AS cantidad_pedidos, p.id_cliente, SUM(total) AS total FROM pedidos p
+	WHERE p.estado = 5
+    AND p.hora_estimada_fin BETWEEN ? AND ?
+    GROUP BY p.id_cliente
+	ORDER BY cantidad_pedidos DESC;`
+
+	pedidos := make([]domain.PedidosPorCliente, 0)
+
+	rows, err := tx.QueryxContext(ctx, queryGetManufacturados, desde, hasta)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cantidad_pedidos, id_cliente int
+		var total float64
+		if err := rows.Scan(&cantidad_pedidos, &id_cliente, &total); err != nil {
+			return pedidos, err
+		}
+		pedByClient := domain.PedidosPorCliente{
+			CantidadPedidos: cantidad_pedidos,
+			IDCliente:       id_cliente,
+			Total:           total,
+		}
+		pedidos = append(pedidos, pedByClient)
+	}
+	return pedidos, nil
+}
+
 // func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, det_pedido domain.DetallePedido) error {
 // 	query := "INSERT INTO detalle_pedidos (cantidad, subtotal, id_articulo_manufacturado, id_articulo_insumo, id_pedido) VALUES (?,?,?,?,?)"
 // 	_, err := tx.ExecContext(ctx, query, det_pedido.Cantidad, det_pedido.Subtotal, det_pedido.IdArticuloManufacturado, det_pedido.IdArticuloInsumo, det_pedido.IdPedido)
@@ -223,7 +256,7 @@ func (i *MySQLPedidoRepository) InsertDetallePedido(ctx context.Context, tx *sql
 }
 
 func (i *MySQLPedidoRepository) RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error) {
-	query := `SELECT p.id AS id_pedido, SUM(dp.cantidad) AS veces_pedida, dp.id_articulo_manufacturado, am.denominacion from pedidos p 
+	query := `SELECT p.id AS id_pedido, SUM(dp.cantidad) AS veces_pedida, dp.id_articulo_manufacturado, am.denominacion FROM pedidos p 
 				JOIN detalle_pedidos dp on dp.id_pedido = p.id
     			JOIN articulo_manufacturado am on am.id = dp.id_articulo_manufacturado
     			WHERE id_articulo_manufacturado IS NOT NULL
@@ -281,6 +314,52 @@ func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx,
 
 	fmt.Println("Ok", ok)
 	return ok, err
+}
+
+func (i *MySQLPedidoRepository) GetCostoTotalByPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (float64, error) {
+	var err error
+	var costo_total_final float64
+	// query para obtener el COSTO TOTAL de bebidas por pedido
+	queryCostoBebidas := `SELECT SUM(precio_compra * dp.cantidad) AS costo_total FROM detalle_pedidos dp
+			JOIN articulo_insumo ai ON ai.id = dp.id_articulo_insumo
+   			WHERE dp.id_pedido = ?;`
+
+	// query para obtener el COSTO TOTAL de manufacturados por pedido
+	queryCostoManufacturados := `SELECT SUM(precio_compra * dp.cantidad) AS costo_total FROM detalle_pedidos dp
+			JOIN articulo_manufacturado am ON am.id = dp.id_articulo_manufacturado
+    		JOIN articulo_manufacturado_detalle amd ON amd.id_articulo_manufacturado = am.id
+			JOIN articulo_insumo ai ON ai.id = amd.id_articulo_insumo
+    		WHERE dp.id_pedido = ?;`
+
+	rows, err := tx.QueryxContext(ctx, queryCostoBebidas, idPedido)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var costo_total float64
+		if err := rows.Scan(&costo_total); err != nil {
+			return 0, err
+		}
+		costo_total_final = costo_total
+	}
+
+	rows, err = tx.QueryxContext(ctx, queryCostoManufacturados, idPedido)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var costo_total float64
+		if err := rows.Scan(&costo_total); err != nil {
+			return 0, err
+		}
+		costo_total_final = costo_total + costo_total_final
+	}
+	fmt.Println("costo_total_final", costo_total_final)
+	return costo_total_final, err
 }
 
 func DescontarStockBebidas(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {

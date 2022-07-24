@@ -18,6 +18,7 @@ type facturaDB struct {
 	NumeroTarjeta  sql.NullString `db:"numero_tarjeta"`
 	TotalVenta     float64        `db:"total_venta"`
 	TotalCosto     float64        `db:"total_costo"`
+	IDPedido       int            `db:"id_pedido"`
 }
 
 func (i *facturaDB) toFactura() domain.Factura {
@@ -30,6 +31,7 @@ func (i *facturaDB) toFactura() domain.Factura {
 		NumeroTarjeta:  database.ToStringP(i.NumeroTarjeta),
 		TotalVenta:     i.TotalVenta,
 		TotalCosto:     i.TotalCosto,
+		IDPedido:       i.IDPedido,
 	}
 }
 
@@ -46,7 +48,7 @@ type MySQLInstrumentoRepository struct {
 
 func NewMySQLInstrumentoRepository() *MySQLInstrumentoRepository {
 	return &MySQLInstrumentoRepository{
-		qInsert:     "INSERT INTO factura (fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo) VALUES (now(),?,?,?,?,?,?)",
+		qInsert:     "INSERT INTO factura (fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo, id_pedido) VALUES (now(),?,?,?,?,?,?,?)",
 		qGetByID:    "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura WHERE id = ?",
 		qGetAll:     "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura",
 		qDeleteById: "DELETE FROM factura WHERE id = ?",
@@ -68,7 +70,7 @@ func (i *MySQLInstrumentoRepository) Delete(ctx context.Context, tx *sqlx.Tx, id
 
 func (i *MySQLInstrumentoRepository) Insert(ctx context.Context, tx *sqlx.Tx, fac domain.Factura) error {
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, fac.Fecha, fac.NumeroFactura, fac.MontoDescuento, fac.FormaPago, fac.NumeroTarjeta, fac.TotalVenta, fac.TotalCosto)
+	_, err := tx.ExecContext(ctx, query, fac.NumeroFactura, fac.MontoDescuento, fac.FormaPago, fac.NumeroTarjeta, fac.TotalVenta, fac.TotalCosto, fac.IDPedido)
 	return err
 }
 

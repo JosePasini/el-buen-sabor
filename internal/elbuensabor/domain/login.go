@@ -18,10 +18,10 @@ type ILoginRepository interface {
 }
 
 const (
-	CLIENTE  = 100
-	CAJERO   = 200
-	DELIVERY = 300
-	COCINERO = 400
+	ADMINISTRATIVO = 100
+	CAJERO         = 200
+	COCINERO       = 300
+	CLIENTE        = 400
 )
 
 type Usuario struct {

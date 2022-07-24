@@ -37,7 +37,7 @@ func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
 	loginService := services.NewLoginService(db, loginRepository)
 
 	pedidoRepository := storage.NewMySQLPedidoRepository()
-	pedidoService := services.NewPedidoService(db, pedidoRepository)
+	pedidoService := services.NewPedidoService(db, pedidoRepository, facturaRepository)
 
 	articuloManufacturadoDetalleRepository := storage.NewMySQLArticuloManufacturadoDetalleRepository()
 	articuloManufacturadoDetalleService := services.NewArticuloManufacturadoDetalleService(db, articuloManufacturadoDetalleRepository)
