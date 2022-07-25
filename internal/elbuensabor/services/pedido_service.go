@@ -13,6 +13,7 @@ import (
 
 type IPedidoService interface {
 	GetAll(context.Context) ([]domain.Pedido, error)
+	GetAllPedidosByIDCliente(context.Context, int) ([]domain.Pedido, error)
 	GetByID(context.Context, int) (*domain.Pedido, error)
 	UpdatePedido(context.Context, domain.Pedido) error
 	UpdateEstadoPedido(context.Context, int, int) error
@@ -22,7 +23,7 @@ type IPedidoService interface {
 	AceptarPedido(context.Context, int) (bool, error)
 	RankingComidasMasPedidas(context.Context, string, string) ([]domain.RankingComidasMasPedidas, error)
 	GetAllDetallePedidosByIDPedido(context.Context, int) ([]domain.DetallePedidoResponse, error)
-	GetPedidosPorClientes(context.Context, string, string) ([]domain.PedidosPorCliente, error)
+	GetRankingDePedidosPorCliente(context.Context, string, string) ([]domain.PedidosPorCliente, error)
 }
 
 type PedidoService struct {
@@ -44,6 +45,15 @@ func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
 	})
 	return pedidos, err
 }
+func (s *PedidoService) GetAllPedidosByIDCliente(ctx context.Context, idCliente int) ([]domain.Pedido, error) {
+	var err error
+	var pedidos []domain.Pedido
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		pedidos, err = s.repository.GetAllPedidosByIDCliente(ctx, tx, idCliente)
+		return err
+	})
+	return pedidos, err
+}
 
 func (s *PedidoService) GetAllDetallePedidosByIDPedido(ctx context.Context, idPedido int) ([]domain.DetallePedidoResponse, error) {
 	var err error
@@ -55,11 +65,11 @@ func (s *PedidoService) GetAllDetallePedidosByIDPedido(ctx context.Context, idPe
 	return detallePedido, err
 }
 
-func (s *PedidoService) GetPedidosPorClientes(ctx context.Context, desde, hasta string) ([]domain.PedidosPorCliente, error) {
+func (s *PedidoService) GetRankingDePedidosPorCliente(ctx context.Context, desde, hasta string) ([]domain.PedidosPorCliente, error) {
 	var err error
 	var pedidosByClient []domain.PedidosPorCliente
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		pedidosByClient, err = s.repository.GetPedidosPorClientes(ctx, tx, desde, hasta)
+		pedidosByClient, err = s.repository.GetRankingDePedidosPorCliente(ctx, tx, desde, hasta)
 		return err
 	})
 	return pedidosByClient, err

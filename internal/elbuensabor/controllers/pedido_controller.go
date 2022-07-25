@@ -12,6 +12,7 @@ import (
 
 type IPedidoController interface {
 	GetByID(*gin.Context)
+	GetAllPedidosByIDCliente(*gin.Context)
 	GetAll(*gin.Context)
 	AddPedido(*gin.Context)
 	AceptarPedido(*gin.Context)
@@ -21,7 +22,7 @@ type IPedidoController interface {
 	DeletePedido(*gin.Context)
 	RankingComidasMasPedidas(*gin.Context)
 	GetAllDetallePedidosByIDPedido(*gin.Context)
-	GetPedidosPorClientes(*gin.Context)
+	GetRankingDePedidosPorCliente(*gin.Context)
 }
 
 type PedidoController struct {
@@ -32,6 +33,29 @@ func NewPedidoController(service services.IPedidoService) *PedidoController {
 	return &PedidoController{service}
 }
 
+func (c PedidoController) GetAllPedidosByIDCliente(ctx *gin.Context) {
+	clienteID := ctx.Param("idCliente")
+
+	ID, err := strconv.Atoi(clienteID)
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid pedido id"))
+		return
+	}
+	pedidos, err := c.service.GetAllPedidosByIDCliente(ctx, ID)
+	if err != nil {
+		if err.Error() == errInternal.Error() {
+			ctx.JSON(404, gin.H{
+				"message": "pedido not found",
+			})
+			return
+		}
+	}
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, pedidos)
+}
 func (c PedidoController) GetByID(ctx *gin.Context) {
 	pedidoID := ctx.Param("idPedido")
 
@@ -83,13 +107,13 @@ func (c PedidoController) GetAllDetallePedidosByIDPedido(ctx *gin.Context) {
 	ctx.JSON(200, pedidos)
 }
 
-func (c PedidoController) GetPedidosPorClientes(ctx *gin.Context) {
+func (c PedidoController) GetRankingDePedidosPorCliente(ctx *gin.Context) {
 	desde := ctx.Query("desde")
 	hasta := ctx.Query("hasta")
 	fmt.Println("desde", desde)
 	fmt.Println("hasta", hasta)
 
-	pedidosByIdCLiente, err := c.service.GetPedidosPorClientes(ctx, desde, hasta)
+	pedidosByIdCLiente, err := c.service.GetRankingDePedidosPorCliente(ctx, desde, hasta)
 	if err != nil {
 		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
 		return

@@ -16,6 +16,10 @@ type IFacturaService interface {
 	UpdateFactura(context.Context, domain.Factura) error
 	DeleteFactura(context.Context, int) error
 	AddFactura(context.Context, domain.Factura) error
+	RecaudacionesDiarias(context.Context, string) ([]domain.Recaudaciones, error)
+	RecaudacionesMensuales(context.Context, string, string) ([]domain.Recaudaciones, error)
+	RecaudacionesPeriodoTiempo(context.Context, string, string) ([]domain.RecaudacionesResponse, error)
+	ObtenerGanancias(context.Context, string, string) ([]domain.Ganancias, error)
 }
 
 type FacturaService struct {
@@ -67,6 +71,46 @@ func (s *FacturaService) GetAll(ctx context.Context) ([]domain.Factura, error) {
 		return err
 	})
 	return facturas, err
+}
+
+func (s *FacturaService) RecaudacionesDiarias(ctx context.Context, fecha string) ([]domain.Recaudaciones, error) {
+	var err error
+	var recaudaciones []domain.Recaudaciones
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		recaudaciones, err = s.repository.RecaudacionesDiarias(ctx, tx, fecha)
+		return err
+	})
+	return recaudaciones, err
+}
+
+func (s *FacturaService) RecaudacionesMensuales(ctx context.Context, month, year string) ([]domain.Recaudaciones, error) {
+	var err error
+	var recaudaciones []domain.Recaudaciones
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		recaudaciones, err = s.repository.RecaudacionesMensuales(ctx, tx, month, year)
+		return err
+	})
+	return recaudaciones, err
+}
+
+func (s *FacturaService) RecaudacionesPeriodoTiempo(ctx context.Context, desde, hasta string) ([]domain.RecaudacionesResponse, error) {
+	var err error
+	var recaudacionesResponse []domain.RecaudacionesResponse
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		recaudacionesResponse, err = s.repository.RecaudacionesPeriodoTiempo(ctx, tx, desde, hasta)
+		return err
+	})
+	return recaudacionesResponse, err
+}
+
+func (s *FacturaService) ObtenerGanancias(ctx context.Context, desde, hasta string) ([]domain.Ganancias, error) {
+	var err error
+	var ganancias []domain.Ganancias
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		ganancias, err = s.repository.ObtenerGanancias(ctx, tx, desde, hasta)
+		return err
+	})
+	return ganancias, err
 }
 
 func (s *FacturaService) DeleteFactura(ctx context.Context, id int) error {

@@ -20,7 +20,8 @@ type IPedidoRepository interface {
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.Pedido, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Pedido, error)
 	GetAllDetallePedidoByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) ([]domain.DetallePedidoResponse, error)
-	GetPedidosPorClientes(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error)
+	GetAllPedidosByIDCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.Pedido, error)
+	GetRankingDePedidosPorCliente(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error)
 	GetCostoTotalByPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (float64, error)
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
@@ -162,6 +163,30 @@ func (i *MySQLPedidoRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]doma
 	}
 	return pedidos, nil
 }
+
+func (i *MySQLPedidoRepository) GetAllPedidosByIDCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.Pedido, error) {
+	queryGetPedidosByCliente := `SELECT * FROM pedidos
+    	WHERE id_cliente = ?;`
+
+	pedidos := make([]domain.Pedido, 0)
+
+	rows, err := tx.QueryxContext(ctx, queryGetPedidosByCliente, idCliente)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var pedido pedidoDB
+		if err := rows.StructScan(&pedido); err != nil {
+			return pedidos, err
+		}
+		pedidos = append(pedidos, pedido.toPedido())
+	}
+
+	return pedidos, nil
+}
+
 func (i *MySQLPedidoRepository) GetAllDetallePedidoByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) ([]domain.DetallePedidoResponse, error) {
 
 	queryGetManufacturados := `SELECT dp.id_pedido, dp.cantidad, dp.subtotal, am.denominacion, am.imagen FROM detalle_pedidos dp
@@ -205,7 +230,7 @@ func (i *MySQLPedidoRepository) GetAllDetallePedidoByIDPedido(ctx context.Contex
 	return pedidos, nil
 }
 
-func (i *MySQLPedidoRepository) GetPedidosPorClientes(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error) {
+func (i *MySQLPedidoRepository) GetRankingDePedidosPorCliente(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.PedidosPorCliente, error) {
 	queryGetManufacturados := `SELECT count(p.id) AS cantidad_pedidos, p.id_cliente, SUM(total) AS total FROM pedidos p
 	WHERE p.estado = 5
     AND p.hora_estimada_fin BETWEEN ? AND ?
@@ -261,6 +286,7 @@ func (i *MySQLPedidoRepository) RankingComidasMasPedidas(ctx context.Context, tx
     			JOIN articulo_manufacturado am on am.id = dp.id_articulo_manufacturado
     			WHERE id_articulo_manufacturado IS NOT NULL
     			AND p.hora_estimada_fin BETWEEN ? AND ?
+				AND p.estado = 5
     			GROUP BY id_articulo_manufacturado
     			ORDER BY veces_pedida desc;`
 

@@ -29,3 +29,22 @@ type PedidosPorCliente struct {
 	IDCliente       int     `json:"id_cliente" db:"id_cliente"`
 	Total           float64 `json:"total" db:"total"`
 }
+
+type Recaudaciones struct {
+	Recaudaciones *float64 `json:"recaudaciones" db:"recaudaciones"`
+	Fecha         *string  `json:"fecha" db:"fecha"`
+}
+
+type Ganancias struct {
+	Ganancias *float64 `json:"ganancias" db:"ganancias"`
+	Desde     *string  `json:"desde" db:"desde"`
+	Hasta     *string  `json:"hasta" db:"hasta"`
+}
+
+type RecaudacionesResponse struct {
+	Fecha         *string  `json:"fecha" db:"fecha"`
+	NumeroFactura *int     `json:"numero_factura" db:"numero_factura"`
+	FormaPago     *string  `json:"forma_pago" db:"forma_pago"`
+	Recaudaciones *float64 `json:"recaudaciones" db:"recaudaciones"`
+	IDPedido      *int     `json:"id_pedido" db:"id_pedido"`
+}

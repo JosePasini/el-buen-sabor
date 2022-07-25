@@ -35,6 +35,8 @@ type App struct {
 
 	ArticuloInsumoService    services.IArticuloInsumoService
 	ArticuloInsumoController controllers.IArticuloInsumoController
+
+	MercadoPagoController controllers.IMercadoPagoController
 }
 
 func NewApp() (*App, error) {
@@ -54,14 +56,18 @@ func NewApp() (*App, error) {
 	container := NewContainer(config, mysqlDB)
 
 	app := App{
-		db:                                     mysqlDB,
-		Config:                                 config,
-		LoginService:                           container.LoginService,
-		LoginController:                        controllers.NewLoginController(container.LoginService),
-		PedidoService:                          container.PedidoService,
-		PedidoController:                       controllers.NewPedidoController(container.PedidoService),
-		FacturaService:                         container.FacturaService,
-		FacturaController:                      controllers.NewFacturaController(container.FacturaService),
+		db:     mysqlDB,
+		Config: config,
+
+		LoginService:    container.LoginService,
+		LoginController: controllers.NewLoginController(container.LoginService),
+
+		PedidoService:    container.PedidoService,
+		PedidoController: controllers.NewPedidoController(container.PedidoService),
+
+		FacturaService:    container.FacturaService,
+		FacturaController: controllers.NewFacturaController(container.FacturaService),
+
 		ArticuloManufacturadoDetalleService:    container.ArticuloManufacturadoDetalleService,
 		ArticuloManufacturadoDetalleController: controllers.NewArticuloManufacturadoDetalleController(container.ArticuloManufacturadoDetalleService),
 
@@ -73,6 +79,8 @@ func NewApp() (*App, error) {
 
 		DomicilioService:    container.DomicilioService,
 		DomicilioController: controllers.NewDomicilioController(container.DomicilioService),
+
+		MercadoPagoController: controllers.NewMercadoPagoController(),
 	}
 	return &app, nil
 }
@@ -103,8 +111,10 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	// mercado pago API - test
 	mercadopago := router.Group("/mercado-pago")
-	mercadopago.POST("/pagar", app.FacturaController.MercadoPago)
-	mercadopago.GET("/metodos-de-pago", app.FacturaController.MetodosDePago)
+	mercadopago.POST("/pagar", app.MercadoPagoController.Pagar)
+	mercadopago.GET("/metodos-de-pago", app.MercadoPagoController.MetodosDePago)
+	//mercadopago.POST("/pagar", app.FacturaController.MercadoPago)
+	//mercadopago.GET("/metodos-de-pago", app.FacturaController.MetodosDePago)
 
 	pedido := router.Group("")
 	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
@@ -117,7 +127,11 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	// Rankings :: Excels
 	// Agregar esta validación al repo cuando esté :: (AND p.estado = 'confirmado y pagado')
 	router.GET("/ranking-comidas", app.PedidoController.RankingComidasMasPedidas)
-	router.GET("/pedidos-por-cliente", app.PedidoController.GetPedidosPorClientes)
+	router.GET("/pedidos-por-cliente", app.PedidoController.GetRankingDePedidosPorCliente)
+	router.GET("/recaudaciones-diarias", app.FacturaController.RecaudacionesDiarias)
+	router.GET("/recaudaciones-mensuales", app.FacturaController.RecaudacionesMensuales)
+	router.GET("/recaudaciones-periodo-tiempo", app.FacturaController.RecaudacionesPeriodoTiempo)
+	router.GET("/ganancias", app.FacturaController.ObtenerGanancias)
 
 	usuarios := router.Group("/usuarios")
 	{
@@ -147,6 +161,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	productoGroup := router.Group("/pedido")
 	{
 		productoGroup.GET("/:idPedido", app.PedidoController.GetByID)
+		productoGroup.GET("/byCliente/:idCliente", app.PedidoController.GetAllPedidosByIDCliente)
 		productoGroup.POST("", app.PedidoController.AddPedido)
 		productoGroup.GET("/getAll", app.PedidoController.GetAll)
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)

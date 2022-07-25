@@ -25,5 +25,9 @@
     },
     {
         "usuario_vendedor":"test_user_53114826@testuser.com"
+    },
+    {
+        "usuario_comprador":"test_user_61796796@testuser.com",
+        "password": "qatest5214"
     }
 ]
