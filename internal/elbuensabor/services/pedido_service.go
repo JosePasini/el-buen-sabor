@@ -116,10 +116,10 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 		var hardcodeta string = "hardcodeta"
 		if estado == domain.FACTURADO {
 
-			ok, err := s.repository.DescontarStock(ctx, tx, IDPedido, estado)
-			if !ok || err != nil {
-				return err
-			}
+			// ok, err := s.repository.DescontarStock(ctx, tx, IDPedido, estado)
+			// if !ok || err != nil {
+			// 	return err
+			// }
 			costo_total, err = s.repository.GetCostoTotalByPedido(ctx, tx, IDPedido)
 			if err != nil {
 				return err
