@@ -115,11 +115,15 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 		var hardcodeta string = "hardcodeta"
 		if estado == domain.FACTURADO {
 
+			ok, err := s.repository.DescontarStock(ctx, tx, IDPedido, estado)
+			if !ok || err != nil {
+				return err
+			}
 			costo_total, err = s.repository.GetCostoTotalByPedido(ctx, tx, IDPedido)
 			if err != nil {
 				return err
 			}
-			if pedido.TipoEnvio == domain.DELIVERY {
+			if pedido.TipoEnvio == domain.RETIRO_LOCAL {
 				descuento = pedido.Total * 0.1
 			}
 			factura := domain.Factura{
@@ -209,11 +213,11 @@ func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, 
 			return errors.New("internal server error")
 		}
 		// comprueba que el estado del pedido sea 1 :: 'pendiente de aprobacion'
-		if pedido.Estado != 1 {
+		if pedido.Estado != domain.PENDIENTE_APROBACION {
 			return errors.New("solo se puede aceptar pedidos en estado 'pendiente de aprobacion' :: 1 ")
 		}
 
-		ok, err = s.repository.DescontarStock(ctx, tx, idPedido)
+		ok, err = s.repository.DescontarStock(ctx, tx, idPedido, pedido.Estado)
 		if err != nil || !ok {
 			return err
 		}

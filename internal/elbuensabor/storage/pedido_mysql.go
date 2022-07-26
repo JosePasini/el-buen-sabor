@@ -26,7 +26,7 @@ type IPedidoRepository interface {
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
-	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error)
+	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido, estado int) (bool, error)
 	UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
 	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error)
 }
@@ -315,7 +315,7 @@ func (i *MySQLPedidoRepository) RankingComidasMasPedidas(ctx context.Context, tx
 	return rankingComidas, nil
 }
 
-func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
+func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido, estado int) (bool, error) {
 	var err error
 	var ok bool
 
@@ -332,10 +332,13 @@ func (i *MySQLPedidoRepository) DescontarStock(ctx context.Context, tx *sqlx.Tx,
 	}
 
 	// Actualizo el 'estado' del pedido a 2 :: Estado 'aceptado'
-	queryActualizarEstadoPedido := "UPDATE pedidos SET estado = 2 WHERE id = ?"
-	_, err = tx.ExecContext(ctx, queryActualizarEstadoPedido, idPedido)
-	if err != nil {
-		return !ok, err
+	var queryActualizarEstadoPedido string
+	if estado == domain.PENDIENTE_APROBACION {
+		queryActualizarEstadoPedido = "UPDATE pedidos SET estado = 2 WHERE id = ?"
+		_, err = tx.ExecContext(ctx, queryActualizarEstadoPedido, idPedido)
+		if err != nil {
+			return !ok, err
+		}
 	}
 
 	fmt.Println("Ok", ok)
@@ -364,11 +367,12 @@ func (i *MySQLPedidoRepository) GetCostoTotalByPedido(ctx context.Context, tx *s
 	defer rows.Close()
 
 	for rows.Next() {
-		var costo_total float64
+		//var costo_total float64
+		var costo_total sql.NullFloat64
 		if err := rows.Scan(&costo_total); err != nil {
 			return 0, err
 		}
-		costo_total_final = costo_total
+		costo_total_final = costo_total.Float64
 	}
 
 	rows, err = tx.QueryxContext(ctx, queryCostoManufacturados, idPedido)
@@ -378,11 +382,12 @@ func (i *MySQLPedidoRepository) GetCostoTotalByPedido(ctx context.Context, tx *s
 	defer rows.Close()
 
 	for rows.Next() {
-		var costo_total float64
+		//var costo_total float64
+		var costo_total sql.NullFloat64
 		if err := rows.Scan(&costo_total); err != nil {
 			return 0, err
 		}
-		costo_total_final = costo_total + costo_total_final
+		costo_total_final = costo_total.Float64 + costo_total_final
 	}
 	fmt.Println("costo_total_final", costo_total_final)
 	return costo_total_final, err
@@ -484,7 +489,7 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 		cantInsumo := strconv.Itoa(des.CantidadInsumo)
 		cantPedida := strconv.Itoa(des.CantidadPedida)
 		artInsumo := strconv.Itoa(des.IDArticuloInsumo)
-		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = IF() ((stock_actual - (", cantInsumo,
+		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = IF( ((stock_actual - (", cantInsumo,
 			" * ", cantPedida, ")) < 0), (stock_actual - ", cantInsumo, " * ", cantPedida, ") , stock_actual ) WHERE id = ", artInsumo}
 		queryDescontarStockOk := strings.Join(query_slices, "")
 		fmt.Println("query 1::", queryDescontarStockOk)
