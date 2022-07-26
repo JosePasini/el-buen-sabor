@@ -21,6 +21,7 @@ type IPedidoService interface {
 	AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
 	AceptarPedido(context.Context, int) (bool, error)
+	CancelarPedido(context.Context, int) error
 	RankingComidasMasPedidas(context.Context, string, string) ([]domain.RankingComidasMasPedidas, error)
 	GetAllDetallePedidosByIDPedido(context.Context, int) ([]domain.DetallePedidoResponse, error)
 	GetRankingDePedidosPorCliente(context.Context, string, string) ([]domain.PedidosPorCliente, error)
@@ -239,6 +240,15 @@ func (s *PedidoService) RankingComidasMasPedidas(ctx context.Context, desde, has
 		return err
 	})
 	return rankingComidasMasPedidas, err
+}
+
+func (s *PedidoService) CancelarPedido(ctx context.Context, idPedido int) error {
+	var err error
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		err = s.repository.CancelarPedido(ctx, tx, idPedido)
+		return err
+	})
+	return err
 }
 
 func VerificarFlujoEstadoPedido(estadoActual, estadoNuevo int) bool {

@@ -10,6 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	StockInsuficiente = errors.New("stock insuficiente")
+)
+
 type IPedidoController interface {
 	GetByID(*gin.Context)
 	GetAllPedidosByIDCliente(*gin.Context)
@@ -156,7 +160,11 @@ func (c PedidoController) AceptarPedido(ctx *gin.Context) {
 	}
 	ok, err := c.service.AceptarPedido(ctx, idPedido)
 	if err != nil || !ok {
-		ctx.JSON(400, errors.New("aceptar pedido error"))
+		fmt.Println("ERRORRR:", err)
+		if err.Error() == StockInsuficiente.Error() {
+			_ = c.service.CancelarPedido(ctx, idPedido)
+		}
+		ctx.JSON(400, err)
 		return
 	}
 	fmt.Println(" -- fin -- ")

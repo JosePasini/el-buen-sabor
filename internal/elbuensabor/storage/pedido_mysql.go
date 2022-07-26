@@ -14,6 +14,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+var (
+	StockInsuficiente = errors.New("stock insuficiente")
+)
+
 type IPedidoRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) (int, error)
 	//InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, detalle_pedido domain.DetallePedido) error
@@ -26,6 +30,7 @@ type IPedidoRepository interface {
 	GetCostoTotalByPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (float64, error)
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
+	CancelarPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) error
 	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido, estado int) (bool, error)
 	UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
@@ -514,7 +519,7 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 			}
 			fmt.Println("Ok:", ok)
 			if !ok {
-				return ok, errors.New("stock insuficiente")
+				return ok, StockInsuficiente
 			}
 		}
 
@@ -528,4 +533,15 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 		}
 	}
 	return ok, err
+}
+
+func (i *MySQLPedidoRepository) CancelarPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) error {
+	queryCancelarPedido := "UPDATE pedidos SET estado = 6 WHERE id = ?"
+	fmt.Println("queryCancelarPedido", queryCancelarPedido)
+	_, err := tx.Exec(queryCancelarPedido, idPedido)
+	if err != nil {
+		return errors.New("no se logro cancelar el pedido correctamente")
+	}
+	fmt.Println("error", err)
+	return err
 }
