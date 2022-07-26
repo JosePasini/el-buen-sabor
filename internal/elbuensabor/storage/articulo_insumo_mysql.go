@@ -79,6 +79,7 @@ type MySQLArticuloInsumoRepository struct {
 	qUpdate     string
 }
 
+//art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.UnidadMedida, art.EsInsumo, art.ID
 func NewMySQLArticuloInsumoRepository() *MySQLArticuloInsumoRepository {
 	return &MySQLArticuloInsumoRepository{
 		qInsert:     "INSERT INTO articulo_insumo (denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo) VALUES (?,?,?,?,?,?,?)",
@@ -176,7 +177,7 @@ func (i *MySQLArticuloInsumoRepository) GetAllCarritoCompleto(ctx context.Contex
 
 func (i *MySQLArticuloInsumoRepository) Update(ctx context.Context, tx *sqlx.Tx, art domain.ArticuloInsumo) error {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.UnidadMedida, art.EsInsumo, art.ID)
+	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.EsInsumo, art.ID)
 	return err
 }
 
