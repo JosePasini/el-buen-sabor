@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -494,11 +495,34 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 		cantInsumo := strconv.Itoa(des.CantidadInsumo)
 		cantPedida := strconv.Itoa(des.CantidadPedida)
 		artInsumo := strconv.Itoa(des.IDArticuloInsumo)
+
+		queryOk := []string{"SELECT IF( ((stock_actual - (", cantInsumo,
+			" * ", cantPedida, ")) > 0), true, false ) FROM articulo_insumo WHERE id = ", artInsumo}
+		queryOkAux := strings.Join(queryOk, "")
+		fmt.Println("query:", queryOkAux)
+		//queryOk := select IF( ((stock_actual - (100 * 55) ) > 0), (stock_actual - 100 * 55), true ) from articulo_insumo WHERE id = 94;
+		rows, err := tx.QueryxContext(ctx, queryOkAux)
+		if err != nil {
+			return !ok, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var ok bool
+			if err := rows.Scan(&ok); err != nil {
+				return ok, err
+			}
+			fmt.Println("Ok:", ok)
+			if !ok {
+				return ok, errors.New("stock insuficiente")
+			}
+		}
+
 		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = IF( ((stock_actual - (", cantInsumo,
 			" * ", cantPedida, ")) > 0), (stock_actual - ", cantInsumo, " * ", cantPedida, ") , stock_actual ) WHERE id = ", artInsumo}
 		queryDescontarStockOk := strings.Join(query_slices, "")
 		fmt.Println("query 1::", queryDescontarStockOk)
-		_, err := tx.ExecContext(ctx, queryDescontarStockOk)
+		_, err = tx.ExecContext(ctx, queryDescontarStockOk)
 		if err != nil {
 			return !ok, err
 		}
