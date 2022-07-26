@@ -438,8 +438,9 @@ func DescontarStockBebidas(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool
 	for _, des := range descontarStockList {
 		stockActual := strconv.Itoa(des.StockActual)
 		articuloID := strconv.Itoa(des.ArticuloID)
+		fmt.Println("stockActual", stockActual)
 		if des.StockActual < 0 {
-			return !ok, err
+			return !ok, StockInsuficiente
 		}
 		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = ", stockActual, " WHERE id = ", articuloID}
 		queryDescontarStock := strings.Join(query_slices, "")
