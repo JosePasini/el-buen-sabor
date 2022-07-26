@@ -123,11 +123,11 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 				descuento = pedido.Total * 0.1
 			}
 			factura := domain.Factura{
-				MontoDescuento: descuento,
+				MontoDescuento: &descuento,
 				FormaPago:      &hardcodeta,
-				TotalVenta:     pedido.Total,
-				TotalCosto:     costo_total,
-				IDPedido:       IDPedido,
+				TotalVenta:     &pedido.Total,
+				TotalCosto:     &costo_total,
+				IDPedido:       &IDPedido,
 			}
 			err = s.repositoryFactura.Insert(ctx, tx, factura)
 			if err != nil {

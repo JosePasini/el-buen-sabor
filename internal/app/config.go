@@ -12,8 +12,11 @@ import (
 
 // NewConfig :: Carga de configuración inicial
 func NewConfig(scope string) (elbuensabor.AppConfig, error) {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("error al cargar las variables de entorno", err)
+	}
 
-	godotenv.Load()
 	// Variables SCOPE LOCAL
 	HOST_LOCAL := os.Getenv("HOST_LOCAL")
 	USERNAME_LOCAL := os.Getenv("USERNAME_LOCAL")

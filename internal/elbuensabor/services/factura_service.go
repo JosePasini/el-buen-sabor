@@ -66,10 +66,12 @@ func (s *FacturaService) AddFactura(ctx context.Context, factura domain.Factura)
 func (s *FacturaService) GetAll(ctx context.Context) ([]domain.Factura, error) {
 	var err error
 	var facturas []domain.Factura
+	fmt.Println("factura services 1")
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		facturas, err = s.repository.GetAll(ctx, tx)
 		return err
 	})
+	fmt.Println("[]factura:", facturas)
 	return facturas, err
 }
 

@@ -479,8 +479,13 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 	//queryDescontarStock := "UPDATE articulo_insumo SET stock_actual = (stock_actual - CantidadInsumo * CantidadPedida) WHERE IDArticuloInsumo = ?"
 
 	for _, des := range descontarStockList {
-		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = (stock_actual - (", strconv.Itoa(des.CantidadInsumo),
-			" * ", strconv.Itoa(des.CantidadPedida), ")) WHERE id = ", strconv.Itoa(des.IDArticuloInsumo)}
+		// query_slices := []string{"UPDATE articulo_insumo SET stock_actual = (stock_actual - (", strconv.Itoa(des.CantidadInsumo),
+		// 	" * ", strconv.Itoa(des.CantidadPedida), ")) WHERE id = ", strconv.Itoa(des.IDArticuloInsumo)}
+		cantInsumo := strconv.Itoa(des.CantidadInsumo)
+		cantPedida := strconv.Itoa(des.CantidadPedida)
+		artInsumo := strconv.Itoa(des.IDArticuloInsumo)
+		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = IF() ((stock_actual - (", cantInsumo,
+			" * ", cantPedida, ")) < 0), (stock_actual - ", cantInsumo, " * ", cantPedida, ") , stock_actual ) WHERE id = ", artInsumo}
 		queryDescontarStockOk := strings.Join(query_slices, "")
 		fmt.Println("query 1::", queryDescontarStockOk)
 		_, err := tx.ExecContext(ctx, queryDescontarStockOk)

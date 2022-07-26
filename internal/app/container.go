@@ -30,7 +30,7 @@ type Container struct {
 }
 
 func NewContainer(config elbuensabor.AppConfig, db database.DB) Container {
-	facturaRepository := storage.NewMySQLInstrumentoRepository()
+	facturaRepository := storage.NewMySQLFacturaRepository()
 	facturaService := services.NewFacturaService(db, facturaRepository)
 
 	loginRepository := storage.NewMySQLLoginRepository()
