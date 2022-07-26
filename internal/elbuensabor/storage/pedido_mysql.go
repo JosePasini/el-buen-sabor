@@ -495,7 +495,7 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 		cantPedida := strconv.Itoa(des.CantidadPedida)
 		artInsumo := strconv.Itoa(des.IDArticuloInsumo)
 		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = IF( ((stock_actual - (", cantInsumo,
-			" * ", cantPedida, ")) < 0), (stock_actual - ", cantInsumo, " * ", cantPedida, ") , stock_actual ) WHERE id = ", artInsumo}
+			" * ", cantPedida, ")) > 0), (stock_actual - ", cantInsumo, " * ", cantPedida, ") , stock_actual ) WHERE id = ", artInsumo}
 		queryDescontarStockOk := strings.Join(query_slices, "")
 		fmt.Println("query 1::", queryDescontarStockOk)
 		_, err := tx.ExecContext(ctx, queryDescontarStockOk)
