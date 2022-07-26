@@ -430,7 +430,12 @@ func DescontarStockBebidas(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool
 	fmt.Println("descontarStockList ::", descontarStockList)
 
 	for _, des := range descontarStockList {
-		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = ", strconv.Itoa(des.StockActual), " WHERE id = ", strconv.Itoa(des.ArticuloID)}
+		stockActual := strconv.Itoa(des.StockActual)
+		articuloID := strconv.Itoa(des.ArticuloID)
+		if des.StockActual < 0 {
+			return !ok, err
+		}
+		query_slices := []string{"UPDATE articulo_insumo SET stock_actual = ", stockActual, " WHERE id = ", articuloID}
 		queryDescontarStock := strings.Join(query_slices, "")
 		fmt.Println("query 2 ::", queryDescontarStock)
 		_, err := tx.ExecContext(ctx, queryDescontarStock)
