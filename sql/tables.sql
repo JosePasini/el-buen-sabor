@@ -43,6 +43,7 @@ CREATE TABLE detalle_pedidos (
 );
 
 DROP TABLE IF EXISTS factura;
+
 CREATE TABLE `heroku_9952cf2f0b46460`.`factura` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `fecha` DATETIME,
@@ -50,7 +51,7 @@ CREATE TABLE `heroku_9952cf2f0b46460`.`factura` (
     `monto_descuento` FLOAT,
     `forma_pago` VARCHAR(255),
     `numero_tarjeta` VARCHAR(255),
-	`total_venta` FLOAT,
+    `total_venta` FLOAT,
     `total_costo` FLOAT,
     `id_pedido` INT,
     PRIMARY KEY (`id`)
@@ -96,5 +97,6 @@ CREATE TABLE `heroku_9952cf2f0b46460`.`domicilio` (
     `calle` VARCHAR(255),
     `numero` INT,
     `localidad` VARCHAR(255),
+    `id_usuario` INT,
     PRIMARY KEY (`id`)
 );

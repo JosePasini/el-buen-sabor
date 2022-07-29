@@ -143,7 +143,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	domicilio := router.Group("/domicilio")
 	{
-		// domicilio.GET("/:id", app.LoginController.GetDomicilioByID)
+		domicilio.GET("/:idUsuario", app.DomicilioController.GetAllDomicilioByUsuario)
 		domicilio.POST("", app.DomicilioController.AddDomicilio)
 		domicilio.PUT("", app.DomicilioController.UpdateDomicilio)
 		// domicilio.DELETE("/:id", app.LoginController.DeleteUsuarioByID)

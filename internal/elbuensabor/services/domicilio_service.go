@@ -12,6 +12,7 @@ import (
 type IDomicilioService interface {
 	AddDomicilio(context.Context, domain.Domicilio) error
 	UpdateDomicilio(context.Context, domain.Domicilio) error
+	GetAllDomicilioByUsuario(context.Context, int) ([]domain.Domicilio, error)
 }
 
 type DomicilioService struct {
@@ -39,4 +40,14 @@ func (s *DomicilioService) UpdateDomicilio(ctx context.Context, domicilio domain
 		return err
 	})
 	return err
+}
+
+func (s *DomicilioService) GetAllDomicilioByUsuario(ctx context.Context, idUsuario int) ([]domain.Domicilio, error) {
+	var err error
+	var domicilios []domain.Domicilio
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		domicilios, err = s.repository.GetAllDomicilioByUsuario(ctx, tx, idUsuario)
+		return err
+	})
+	return domicilios, err
 }
