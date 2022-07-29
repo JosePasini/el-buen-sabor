@@ -48,7 +48,7 @@ func NewMySQLDomicilioRepository() *MySQLDomicilioRepository {
 	return &MySQLDomicilioRepository{
 		qInsert:                   "INSERT INTO domicilio (calle, numero, localidad, id_usuario) VALUES (?,?,?,?)",
 		qUpdate:                   "UPDATE domicilio SET calle = COALESCE(?,calle), numero = COALESCE(?,numero),localidad = COALESCE(?,localidad) WHERE id = ?",
-		qGetAllDomicilioByUsuario: "SELECT d.id, d.calle, d.numero, d.localidad, d.id_domicilio FROM domicilio d JOIN usuarios u ON d.id_usuario = u.id WHERE d.id_usuario = ?",
+		qGetAllDomicilioByUsuario: "SELECT d.id, d.calle, d.numero, d.localidad, d.id_usuario FROM domicilio d JOIN usuarios u ON d.id_usuario = u.id WHERE d.id_usuario = ?",
 		//qGetByID:    "SELECT id, cantidad, id_articulo_manufacturado, id_articulo_insumo FROM articulo_manufacturado_detalle WHERE id = ?",
 		//qDeleteById: "DELETE FROM articulo_manufacturado_detalle WHERE id = ?",
 	}
