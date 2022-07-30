@@ -113,9 +113,8 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 			return err
 		}
 		var descuento, costo_total float64
-		var hardcodeta string = "hardcodeta"
+		//var hardcodeta string = "hardcodeta"
 		if estado == domain.FACTURADO {
-
 			// ok, err := s.repository.DescontarStock(ctx, tx, IDPedido, estado)
 			// if !ok || err != nil {
 			// 	return err
@@ -129,7 +128,7 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 			}
 			factura := domain.Factura{
 				MontoDescuento: &descuento,
-				FormaPago:      &hardcodeta,
+				FormaPago:      pedido.DetalleEnvio,
 				TotalVenta:     &pedido.Total,
 				TotalCosto:     &costo_total,
 				IDPedido:       &IDPedido,
