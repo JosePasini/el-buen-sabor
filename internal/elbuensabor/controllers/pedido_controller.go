@@ -166,7 +166,7 @@ func (c PedidoController) AceptarPedido(ctx *gin.Context) {
 		if err.Error() == StockInsuficiente.Error() {
 			_ = c.service.CancelarPedido(ctx, idPedido)
 		}
-		ctx.JSON(400, err)
+		ctx.JSON(400, gin.H{"status": 400, "error": err.Error()})
 		return
 	}
 	fmt.Println(" -- fin -- ")
@@ -202,11 +202,7 @@ func (c PedidoController) VerificarStock(ctx *gin.Context) {
 
 	ok, err := c.service.VerificarStock(ctx, idPedido, amount, esBebida)
 	if err != nil || !ok {
-		fmt.Println("ERRORRR:", err)
-		if err.Error() == StockInsuficiente.Error() {
-			_ = c.service.CancelarPedido(ctx, idPedido)
-		}
-		ctx.JSON(400, err)
+		ctx.JSON(400, gin.H{"status": 400, "error": err.Error()})
 		return
 	}
 	fmt.Println(" -- fin -- ")

@@ -244,8 +244,9 @@ func (s *PedidoService) VerificarStock(ctx context.Context, idArticulo, amount i
 			fmt.Println("es bebida false", esBebida)
 			ok, err = s.repository.VerificarStockManufacturado(ctx, tx, idArticulo, amount)
 		}
-		if err != nil {
-			return errors.New("internal server error")
+		if !ok || err != nil {
+			fmt.Println("err", err)
+			return err
 		}
 		return err
 	})
@@ -253,7 +254,7 @@ func (s *PedidoService) VerificarStock(ctx context.Context, idArticulo, amount i
 	if err != nil {
 		return false, err
 	}
-	return ok, nil
+	return ok, err
 }
 
 func (s *PedidoService) RankingComidasMasPedidas(ctx context.Context, desde, hasta string) ([]domain.RankingComidasMasPedidas, error) {
