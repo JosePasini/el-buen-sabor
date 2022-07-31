@@ -21,6 +21,7 @@ type IPedidoService interface {
 	AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
 	AceptarPedido(context.Context, int) (bool, error)
+	VerificarStock(context.Context, int, int, bool) (bool, error)
 	CancelarPedido(context.Context, int) error
 	RankingComidasMasPedidas(context.Context, string, string) ([]domain.RankingComidasMasPedidas, error)
 	GetAllDetallePedidosByIDPedido(context.Context, int) ([]domain.DetallePedidoResponse, error)
@@ -231,6 +232,30 @@ func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, 
 	return true, nil
 }
 
+func (s *PedidoService) VerificarStock(ctx context.Context, idArticulo, amount int, esBebida bool) (bool, error) {
+	var err error
+	var ok bool = true
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		// obtengo el pedido por id para comprobar que exista
+		if esBebida {
+			fmt.Println("es bebida true", esBebida)
+			ok, err = s.repository.VerificarStockBebidas(ctx, tx, idArticulo, amount)
+		} else {
+			fmt.Println("es bebida false", esBebida)
+			ok, err = s.repository.VerificarStockManufacturado(ctx, tx, idArticulo, amount)
+		}
+		if err != nil {
+			return errors.New("internal server error")
+		}
+		return err
+	})
+	fmt.Println(err)
+	if err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
 func (s *PedidoService) RankingComidasMasPedidas(ctx context.Context, desde, hasta string) ([]domain.RankingComidasMasPedidas, error) {
 	var err error
 	var rankingComidasMasPedidas []domain.RankingComidasMasPedidas
@@ -248,21 +273,4 @@ func (s *PedidoService) CancelarPedido(ctx context.Context, idPedido int) error 
 		return err
 	})
 	return err
-}
-
-func VerificarFlujoEstadoPedido(estadoActual, estadoNuevo int) bool {
-	var ok bool = true
-
-	if estadoActual == 2 {
-		if estadoNuevo == 3 {
-			return ok
-		}
-	}
-
-	if estadoActual == 3 {
-		if estadoNuevo == 4 || estadoNuevo == 6 {
-			return ok
-		}
-	}
-	return !ok
 }

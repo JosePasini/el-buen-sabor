@@ -27,6 +27,7 @@ type IPedidoController interface {
 	RankingComidasMasPedidas(*gin.Context)
 	GetAllDetallePedidosByIDPedido(*gin.Context)
 	GetRankingDePedidosPorCliente(*gin.Context)
+	VerificarStock(*gin.Context)
 }
 
 type PedidoController struct {
@@ -60,6 +61,7 @@ func (c PedidoController) GetAllPedidosByIDCliente(ctx *gin.Context) {
 	}
 	ctx.JSON(200, pedidos)
 }
+
 func (c PedidoController) GetByID(ctx *gin.Context) {
 	pedidoID := ctx.Param("idPedido")
 
@@ -159,6 +161,46 @@ func (c PedidoController) AceptarPedido(ctx *gin.Context) {
 		return
 	}
 	ok, err := c.service.AceptarPedido(ctx, idPedido)
+	if err != nil || !ok {
+		fmt.Println("ERRORRR:", err)
+		if err.Error() == StockInsuficiente.Error() {
+			_ = c.service.CancelarPedido(ctx, idPedido)
+		}
+		ctx.JSON(400, err)
+		return
+	}
+	fmt.Println(" -- fin -- ")
+	ctx.JSON(200, gin.H{"status": 200, "ok": ok})
+}
+
+func (c PedidoController) VerificarStock(ctx *gin.Context) {
+	idParam := ctx.Param("idArticulo")
+	amountParam := ctx.Param("amount")
+	esBebidaParam := ctx.Param("esBebida")
+
+	idPedido, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("add pedido error"))
+		return
+	}
+
+	amount, err := strconv.Atoi(amountParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("add pedido error"))
+		return
+	}
+
+	esBebida, err := strconv.ParseBool(esBebidaParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("add pedido error"))
+		return
+	}
+
+	fmt.Println(idPedido)
+	fmt.Println(amount)
+	fmt.Println(esBebida)
+
+	ok, err := c.service.VerificarStock(ctx, idPedido, amount, esBebida)
 	if err != nil || !ok {
 		fmt.Println("ERRORRR:", err)
 		if err.Error() == StockInsuficiente.Error() {

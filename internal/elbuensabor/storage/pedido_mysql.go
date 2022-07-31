@@ -35,6 +35,8 @@ type IPedidoRepository interface {
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido, estado int) (bool, error)
 	UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
 	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error)
+	VerificarStockBebidas(ctx context.Context, tx *sqlx.Tx, idArticulo, amount int) (bool, error)
+	VerificarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idArticulo, amount int) (bool, error)
 }
 
 type pedidoDB struct {
@@ -456,6 +458,29 @@ func DescontarStockBebidas(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool
 	return ok, nil
 }
 
+func (i *MySQLPedidoRepository) VerificarStockBebidas(ctx context.Context, tx *sqlx.Tx, idArticulo, amount int) (bool, error) {
+	var ok bool = true
+	queryArticuloInsumo := `SELECT IF( (( articulo_insumo.stock_actual - ? ) >= 0), true, false) from articulo_insumo WHERE id = ?;`
+
+	rows, err := tx.QueryxContext(ctx, queryArticuloInsumo, amount, idArticulo)
+	if err != nil {
+		return !ok, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var ok bool
+		if err := rows.Scan(&ok); err != nil {
+			return ok, err
+		}
+		fmt.Println("Ok:", ok)
+		if !ok {
+			return ok, StockInsuficiente
+		}
+	}
+	return ok, nil
+}
+
 func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int) (bool, error) {
 	var ok bool = true
 	type DescontarStockInsumosQuery struct {
@@ -531,6 +556,70 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 		_, err = tx.ExecContext(ctx, queryDescontarStockOk)
 		if err != nil {
 			return !ok, err
+		}
+	}
+	return ok, err
+}
+
+func (i *MySQLPedidoRepository) VerificarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idArticulo, amount int) (bool, error) {
+	var ok bool = true
+	type VerificarStockInsumosQuery struct {
+		CantidadPedida int
+		StockActual    int
+	}
+
+	var verificarStockList []VerificarStockInsumosQuery
+
+	queryArticuloManufacturado := `select amd.cantidad, ai.stock_actual from articulo_manufacturado am 
+				JOIN articulo_manufacturado_detalle amd on amd.id_articulo_manufacturado = am.id
+    			JOIN articulo_insumo ai on ai.id = amd.id_articulo_insumo
+    			AND ai.es_insumo = true
+    			AND am.id = ?`
+
+	rows, err := tx.QueryxContext(ctx, queryArticuloManufacturado, idArticulo)
+	if err != nil {
+		return !ok, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var stock_actual, cantidad_pedida int
+		if err := rows.Scan(&stock_actual, &cantidad_pedida); err != nil {
+			return !ok, err
+		}
+		verificarStock := VerificarStockInsumosQuery{
+			CantidadPedida: cantidad_pedida,
+			StockActual:    stock_actual,
+		}
+		verificarStockList = append(verificarStockList, verificarStock)
+	}
+
+	for _, des := range verificarStockList {
+		stockActual := strconv.Itoa(des.StockActual)
+		cantPedida := strconv.Itoa(des.CantidadPedida)
+		idArticuloQ := strconv.Itoa(idArticulo)
+		amountQ := strconv.Itoa(amount)
+
+		//SELECT IF( ((stock_actual - ( amount * cantidad ) ) >= 0), true, false) from articulo_insumo WHERE id = 94;
+		queryOk := []string{"SELECT IF( (( ", stockActual, " - (", amountQ,
+			" * ", cantPedida, ")) >= 0), true, false ) FROM articulo_insumo WHERE id = ", idArticuloQ}
+		queryOkAux := strings.Join(queryOk, "")
+		fmt.Println("query:", queryOkAux)
+		rows, err := tx.QueryxContext(ctx, queryOkAux)
+		if err != nil {
+			return !ok, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var ok bool
+			if err := rows.Scan(&ok); err != nil {
+				return ok, err
+			}
+			fmt.Println("Ok:", ok)
+			if !ok {
+				return ok, StockInsuficiente
+			}
 		}
 	}
 	return ok, err

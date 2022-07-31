@@ -121,7 +121,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
 	pedido.GET("/detalle-pedido/:idPedido", app.PedidoController.GetAllDetallePedidosByIDPedido)
 	pedido.PUT("/pedido/update-estado", app.PedidoController.UpdateEstadoPedido)
-
+	pedido.GET("/verificar-stock/:idArticulo/:amount/:esBebida", app.PedidoController.VerificarStock)
 	router.GET("/carrito-completo-getAll", app.ArticuloInsumoController.GetAllCarritoCompleto)
 
 	// Rankings :: Excels
