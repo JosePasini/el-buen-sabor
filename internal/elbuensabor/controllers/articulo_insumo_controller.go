@@ -17,6 +17,7 @@ type IArticuloInsumoController interface {
 	AddArticuloInsumo(*gin.Context)
 	UpdateArticuloInsumo(*gin.Context)
 	DeleteArticuloInsumo(*gin.Context)
+	AgregarStockInsumo(*gin.Context)
 }
 
 type ArticuloInsumoController struct {
@@ -145,5 +146,28 @@ func (c *ArticuloInsumoController) DeleteArticuloInsumo(ctx *gin.Context) {
 
 	ctx.JSON(200, gin.H{
 		"message": "factura deleted successfully",
+	})
+}
+
+func (c *ArticuloInsumoController) AgregarStockInsumo(ctx *gin.Context) {
+	var agregarStock domain.AgregarStockInsumo
+
+	err := ctx.BindJSON(&agregarStock)
+	fmt.Println("agregarStock:", agregarStock)
+
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid articulo to be add stock"))
+		return
+	}
+
+	err = c.service.SumarStockInsumo(ctx, agregarStock)
+	if err != nil {
+		ctx.JSON(500, errors.New("internal error server"))
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"status":  200,
+		"message": "articulo updated successfully",
 	})
 }

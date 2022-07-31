@@ -68,6 +68,7 @@ CREATE TABLE `elbuensabor`.`articulo_insumo` (
     `stock_minimo` INT,
     `unidad_medida` VARCHAR(255),
     `es_insumo` BOOL,
+    `id_categoria` INT,
     PRIMARY KEY (`id`)
 );
 
@@ -89,6 +90,7 @@ CREATE TABLE `elbuensabor`.`articulo_manufacturado` (
     `denominacion` VARCHAR(255),
     `precio_venta` FLOAT,
     `imagen` VARCHAR(255),
+    `id_categoria` INT,
     PRIMARY KEY (`id`)
 );
 
@@ -98,5 +100,11 @@ CREATE TABLE `heroku_9952cf2f0b46460`.`domicilio` (
     `numero` INT,
     `localidad` VARCHAR(255),
     `id_usuario` INT,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `heroku_9952cf2f0b46460`.`categoria` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(255),
     PRIMARY KEY (`id`)
 );

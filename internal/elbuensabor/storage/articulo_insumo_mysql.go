@@ -68,6 +68,7 @@ type IArticuloInsumoRepository interface {
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.ArticuloInsumo, error)
 	GetAllCarritoCompleto(ctx context.Context, tx *sqlx.Tx) ([]domain.CarritoCompleto, error)
 	Update(ctx context.Context, tx *sqlx.Tx, articulo_manufacturado_detalle domain.ArticuloInsumo) error
+	SumarStockInsumo(ctx context.Context, tx *sqlx.Tx, agregarStock domain.AgregarStockInsumo) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 }
 
@@ -178,6 +179,12 @@ func (i *MySQLArticuloInsumoRepository) GetAllCarritoCompleto(ctx context.Contex
 func (i *MySQLArticuloInsumoRepository) Update(ctx context.Context, tx *sqlx.Tx, art domain.ArticuloInsumo) error {
 	query := i.qUpdate
 	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.EsInsumo, art.ID)
+	return err
+}
+
+func (i *MySQLArticuloInsumoRepository) SumarStockInsumo(ctx context.Context, tx *sqlx.Tx, art domain.AgregarStockInsumo) error {
+	query := "UPDATE articulo_insumo SET stock_actual = (stock_actual + ? ) WHERE id = ?"
+	_, err := tx.ExecContext(ctx, query, art.Cantidad, art.IDArticuloInsumo)
 	return err
 }
 

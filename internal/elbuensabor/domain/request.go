@@ -6,12 +6,9 @@ type Login struct {
 }
 
 type ProductoMercadoPago struct {
-	//ID                   int     `json:"id"`
-	PrecioVenta float64 `json:"precio_venta"`
-	//TiempoEstimadoCocina int     `json:"tiempo_estimado_cocina"`
-	Amount int `json:"amount"`
-	//Imagen               string  `json:"imagen"`
-	Denominacion string `json:"denominacion"`
+	PrecioVenta  float64 `json:"precio_venta"`
+	Amount       int     `json:"amount"`
+	Denominacion string  `json:"denominacion"`
 }
 
 type UsuarioMercadoPago struct {
@@ -42,4 +39,9 @@ type GenerarPedido struct {
 type PedidoEstado struct {
 	IDPedido int `json:"id_pedido"`
 	Estado   int `json:"estado"`
+}
+
+type AgregarStockInsumo struct {
+	IDArticuloInsumo int `json:"id_articulo_insumo"`
+	Cantidad         int `json:"cantidad"`
 }

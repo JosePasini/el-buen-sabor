@@ -36,6 +36,9 @@ type App struct {
 	ArticuloInsumoService    services.IArticuloInsumoService
 	ArticuloInsumoController controllers.IArticuloInsumoController
 
+	CategoriaService    services.ICategoriaService
+	CategoriaController controllers.ICategoriaController
+
 	MercadoPagoController controllers.IMercadoPagoController
 }
 
@@ -79,6 +82,9 @@ func NewApp() (*App, error) {
 
 		DomicilioService:    container.DomicilioService,
 		DomicilioController: controllers.NewDomicilioController(container.DomicilioService),
+
+		CategoriaService:    container.CategoriaService,
+		CategoriaController: controllers.NewCategoriaController(container.CategoriaService),
 
 		MercadoPagoController: controllers.NewMercadoPagoController(),
 	}
@@ -149,6 +155,12 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		// domicilio.DELETE("/:id", app.LoginController.DeleteUsuarioByID)
 	}
 
+	categoria := router.Group("/categoria")
+	{
+		categoria.GET("/getAll", app.CategoriaController.GetAllCategoria)
+		categoria.POST("", app.CategoriaController.AddCategoria)
+	}
+
 	instrumentoGroup := router.Group("/factura")
 	{
 		instrumentoGroup.GET("/:idFactura", app.FacturaController.GetByID)
@@ -175,6 +187,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		articuloInsumo.GET("/getAll", app.ArticuloInsumoController.GetAll)
 		articuloInsumo.DELETE("/:id", app.ArticuloInsumoController.DeleteArticuloInsumo)
 		articuloInsumo.PUT("", app.ArticuloInsumoController.UpdateArticuloInsumo)
+		articuloInsumo.PUT("/agregar-stock-insumo", app.ArticuloInsumoController.AgregarStockInsumo)
 	}
 
 	articuloManufacturadoDetalle := router.Group("/articulo-manufacturado-detalle")

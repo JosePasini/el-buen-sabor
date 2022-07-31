@@ -18,6 +18,7 @@ type IArticuloInsumoService interface {
 	UpdateArticuloInsumo(context.Context, domain.ArticuloInsumo) error
 	DeleteArticuloInsumo(context.Context, int) error
 	AddArticuloInsumo(context.Context, domain.ArticuloInsumo) error
+	SumarStockInsumo(context.Context, domain.AgregarStockInsumo) error
 }
 
 type ArticuloInsumoService struct {
@@ -33,6 +34,15 @@ func (s *ArticuloInsumoService) UpdateArticuloInsumo(ctx context.Context, articu
 	var err error
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		err = s.repository.Update(ctx, tx, articuloInsumo)
+		return err
+	})
+	return err
+}
+
+func (s *ArticuloInsumoService) SumarStockInsumo(ctx context.Context, agregarStock domain.AgregarStockInsumo) error {
+	var err error
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		err = s.repository.SumarStockInsumo(ctx, tx, agregarStock)
 		return err
 	})
 	return err
