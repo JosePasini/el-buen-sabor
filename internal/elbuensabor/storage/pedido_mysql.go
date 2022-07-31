@@ -564,13 +564,13 @@ func DescontarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idPedido int)
 func (i *MySQLPedidoRepository) VerificarStockManufacturado(ctx context.Context, tx *sqlx.Tx, idArticulo, amount int) (bool, error) {
 	var ok bool = true
 	type VerificarStockInsumosQuery struct {
-		CantidadPedida int
-		StockActual    int
+		Cantidad    int
+		StockActual int
 	}
 
 	var verificarStockList []VerificarStockInsumosQuery
 
-	queryArticuloManufacturado := `select amd.cantidad, ai.stock_actual from articulo_manufacturado am 
+	queryArticuloManufacturado := `select ai.stock_actual, amd.cantidad from articulo_manufacturado am 
 				JOIN articulo_manufacturado_detalle amd on amd.id_articulo_manufacturado = am.id
     			JOIN articulo_insumo ai on ai.id = amd.id_articulo_insumo
     			AND ai.es_insumo = true
@@ -588,21 +588,21 @@ func (i *MySQLPedidoRepository) VerificarStockManufacturado(ctx context.Context,
 			return !ok, err
 		}
 		verificarStock := VerificarStockInsumosQuery{
-			CantidadPedida: cantidad_pedida,
-			StockActual:    stock_actual,
+			Cantidad:    cantidad_pedida,
+			StockActual: stock_actual,
 		}
 		verificarStockList = append(verificarStockList, verificarStock)
 	}
 
 	for _, des := range verificarStockList {
 		stockActual := strconv.Itoa(des.StockActual)
-		cantPedida := strconv.Itoa(des.CantidadPedida)
+		cantidad := strconv.Itoa(des.Cantidad)
 		idArticuloQ := strconv.Itoa(idArticulo)
 		amountQ := strconv.Itoa(amount)
 
 		//SELECT IF( ((stock_actual - ( amount * cantidad ) ) >= 0), true, false) from articulo_insumo WHERE id = 94;
 		queryOk := []string{"SELECT IF( (( ", stockActual, " - (", amountQ,
-			" * ", cantPedida, ")) >= 0), true, false ) FROM articulo_insumo WHERE id = ", idArticuloQ}
+			" * ", cantidad, ")) >= 0), true, false ) FROM articulo_insumo WHERE id = ", idArticuloQ}
 		queryOkAux := strings.Join(queryOk, "")
 		fmt.Println("query:", queryOkAux)
 		rows, err := tx.QueryxContext(ctx, queryOkAux)
