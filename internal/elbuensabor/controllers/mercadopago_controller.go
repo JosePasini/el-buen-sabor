@@ -53,10 +53,9 @@ func (c *MercadoPagoController) Pagar(ctx *gin.Context) {
 	var itemsMercadoPago []mercadopago.Item
 	for _, prod := range listaProductos {
 		itemMP := mercadopago.Item{
-			Title:      prod.Denominacion,
-			PictureURL: prod.Imagen,
-			Quantity:   float64(prod.Amount),
-			UnitPrice:  prod.PrecioVenta,
+			Title:     prod.Denominacion,
+			Quantity:  float64(prod.Amount),
+			UnitPrice: prod.PrecioVenta,
 		}
 		itemsMercadoPago = append(itemsMercadoPago, itemMP)
 	}

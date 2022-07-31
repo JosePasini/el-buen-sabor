@@ -6,12 +6,12 @@ type Login struct {
 }
 
 type ProductoMercadoPago struct {
-	ID                   int     `json:"id"`
-	PrecioVenta          float64 `json:"precio_venta"`
-	TiempoEstimadoCocina int     `json:"tiempo_estimado_cocina"`
-	Amount               int     `json:"amount"`
-	Imagen               string  `json:"imagen"`
-	Denominacion         string  `json:"denominacion"`
+	//ID                   int     `json:"id"`
+	PrecioVenta float64 `json:"precio_venta"`
+	//TiempoEstimadoCocina int     `json:"tiempo_estimado_cocina"`
+	Amount int `json:"amount"`
+	//Imagen               string  `json:"imagen"`
+	Denominacion string `json:"denominacion"`
 }
 
 type UsuarioMercadoPago struct {

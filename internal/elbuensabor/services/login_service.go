@@ -113,19 +113,10 @@ func (s *LoginService) UpdateUsuario(ctx context.Context, usuario domain.Usuario
 	var usuarioResponse domain.Usuario
 	var err error
 
-	bytesReturned, err := usuario.GeneratePassword(*usuario.Hash)
-	if err != nil {
-		return domain.Usuario{}, err
-	}
-
-	pass := string(bytesReturned)
-	usuario.Hash = &pass
-
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		usuarioResponse, err = s.repository.UpdateUsuario(ctx, tx, usuario)
 		return err
 	})
-	//fmt.Println("Updateado?:", usuarioResponse)
 	if err != nil {
 		return domain.Usuario{}, err
 	}

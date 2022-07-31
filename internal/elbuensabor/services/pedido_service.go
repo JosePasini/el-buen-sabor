@@ -124,7 +124,7 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 			if err != nil {
 				return err
 			}
-			if pedido.TipoEnvio == domain.RETIRO_LOCAL {
+			if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
 				descuento = pedido.Total * 0.1
 			}
 			factura := domain.Factura{

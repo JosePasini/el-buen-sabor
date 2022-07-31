@@ -68,7 +68,7 @@ func NewMySQLLoginRepository() *MySQLLoginRepository {
 		qGetByID:    "SELECT id, nombre, apellido, email, usuario, rol FROM usuarios WHERE id = ?",
 		qGetByEmail: "SELECT id, nombre, apellido, email, usuario, rol FROM usuarios WHERE email = ?",
 		qDeleteById: "DELETE FROM usuarios WHERE id = ?",
-		qUpdate:     "UPDATE usuarios SET nombre = COALESCE(?,nombre), apellido = COALESCE(?,apellido), usuario = COALESCE(?,usuario) , email = COALESCE(?,email), hash = COALESCE(?,hash) WHERE id = ?",
+		qUpdate:     "UPDATE usuarios SET nombre = COALESCE(?,nombre), apellido = COALESCE(?,apellido), usuario = COALESCE(?,usuario) , email = COALESCE(?,email), rol = COALESCE(?,rol) WHERE id = ?",
 		qGetHash:    "SELECT hash FROM usuarios WHERE email = ?",
 	}
 }
@@ -152,7 +152,7 @@ func (i *MySQLLoginRepository) DeleteUsuarioByID(ctx context.Context, tx *sqlx.T
 
 func (i *MySQLLoginRepository) UpdateUsuario(ctx context.Context, tx *sqlx.Tx, u domain.Usuario) (domain.Usuario, error) {
 	query := i.qUpdate
-	_, err := tx.ExecContext(ctx, query, u.Nombre, u.Apellido, u.Usuario, u.Email, u.Hash, u.ID)
+	_, err := tx.ExecContext(ctx, query, u.Nombre, u.Apellido, u.Usuario, u.Email, u.Rol, u.ID)
 	if err != nil {
 		return u, err
 	}
