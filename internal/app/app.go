@@ -1,7 +1,9 @@
 package app
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/controllers"
@@ -91,6 +93,17 @@ func NewApp() (*App, error) {
 	return &app, nil
 }
 
+func controlHorarios(ctx *gin.Context) {
+	now := time.Now()
+	if now.Hour() <= 20 || now.Hour() >= 24 {
+		ctx.AbortWithStatusJSON(400, "comercio cerrado de 20 a 24 hs (horario Argentina). lo esperamos en ese horario. saludos")
+		return
+	} else {
+		log.Println("horario aceptado")
+		ctx.Next()
+	}
+}
+
 func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	router.Use(cors.New(cors.Config{
@@ -119,11 +132,9 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	mercadopago := router.Group("/mercado-pago")
 	mercadopago.POST("/pagar", app.MercadoPagoController.Pagar)
 	mercadopago.GET("/metodos-de-pago", app.MercadoPagoController.MetodosDePago)
-	//mercadopago.POST("/pagar", app.FacturaController.MercadoPago)
-	//mercadopago.GET("/metodos-de-pago", app.FacturaController.MetodosDePago)
 
 	pedido := router.Group("")
-	pedido.PUT("/generar-pedido", app.PedidoController.GenerarPedido)
+	pedido.PUT("/generar-pedido", controlHorarios, app.PedidoController.GenerarPedido)
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
 	pedido.GET("/detalle-pedido/:idPedido", app.PedidoController.GetAllDetallePedidosByIDPedido)
 	pedido.PUT("/pedido/update-estado", app.PedidoController.UpdateEstadoPedido)
