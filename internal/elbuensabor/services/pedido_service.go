@@ -198,11 +198,11 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		fmt.Println("cantidadDeCocineros service", cantidadDeCocineros)
 		fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
 		fmt.Println("tiempoTotalEstimado:", tiempoTotalEstimado)
+
 		// creamos un 'pedido' en la BD y nos retorna el ID
 		idPedido, err = s.repository.Insert(ctx, tx, pedido, tiempoTotalEstimado)
-		//fechaActual := time.Now()
-
 		fmt.Println("time.Now():", time.Now())
+
 		// insertamos todos los detalles con el ID de pedido.
 		if len(detallePedido) > 0 {
 			for _, detalle := range detallePedido {

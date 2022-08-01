@@ -96,7 +96,7 @@ func NewApp() (*App, error) {
 func controlHorarios(ctx *gin.Context) {
 	now := time.Now()
 	if now.Hour() <= 20 || now.Hour() >= 24 {
-		ctx.AbortWithStatusJSON(400, "comercio cerrado de 20 a 24 hs (horario Argentina). lo esperamos en ese horario. saludos")
+		ctx.AbortWithStatusJSON(405, "comercio cerrado de 20 a 24 hs (horario Argentina). lo esperamos en ese horario. saludos")
 		return
 	} else {
 		log.Println("horario aceptado")
