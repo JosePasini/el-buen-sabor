@@ -12,8 +12,8 @@ const (
 )
 
 const (
-	ENVIO_DELIVERY     int = 1
-	ENVIO_RETIRO_LOCAL int = 2
+	ENVIO_RETIRO_LOCAL int = 1
+	ENVIO_DELIVERY     int = 2
 )
 
 type Pedido struct {

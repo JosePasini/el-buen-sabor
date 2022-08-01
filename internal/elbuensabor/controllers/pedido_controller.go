@@ -18,7 +18,7 @@ type IPedidoController interface {
 	GetByID(*gin.Context)
 	GetAllPedidosByIDCliente(*gin.Context)
 	GetAll(*gin.Context)
-	AddPedido(*gin.Context)
+	//AddPedido(*gin.Context)
 	AceptarPedido(*gin.Context)
 	GenerarPedido(*gin.Context)
 	UpdatePedido(*gin.Context)
@@ -129,15 +129,11 @@ func (c PedidoController) GetRankingDePedidosPorCliente(ctx *gin.Context) {
 
 func (c PedidoController) GenerarPedido(ctx *gin.Context) {
 	var pedido domain.GenerarPedido
-
-	fmt.Println("1")
-
 	err := ctx.BindJSON(&pedido)
 	if err != nil {
 		ctx.JSON(400, errors.New("generate pedido error"))
 		return
 	}
-	fmt.Println("2")
 	fmt.Println(pedido)
 	fmt.Println(":::", pedido.Pedido)
 	pedido, err = c.service.GenerarPedido(ctx, pedido)
@@ -209,21 +205,21 @@ func (c PedidoController) VerificarStock(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"status": 200, "ok": ok})
 }
 
-func (c PedidoController) AddPedido(ctx *gin.Context) {
-	var pedido domain.Pedido
-	err := ctx.BindJSON(&pedido)
-	if err != nil {
-		ctx.JSON(400, errors.New("error bind"))
-		return
-	}
+// func (c PedidoController) AddPedido(ctx *gin.Context) {
+// 	var pedido domain.Pedido
+// 	err := ctx.BindJSON(&pedido)
+// 	if err != nil {
+// 		ctx.JSON(400, errors.New("error bind"))
+// 		return
+// 	}
 
-	err = c.service.AddPedido(ctx, pedido)
-	if err != nil {
-		ctx.JSON(400, errors.New("add pedido error"))
-		return
-	}
-	ctx.JSON(200, gin.H{"status": 200, "pedido": pedido})
-}
+// 	err = c.service.AddPedido(ctx, pedido)
+// 	if err != nil {
+// 		ctx.JSON(400, errors.New("add pedido error"))
+// 		return
+// 	}
+// 	ctx.JSON(200, gin.H{"status": 200, "pedido": pedido})
+// }
 
 func (c PedidoController) UpdatePedido(ctx *gin.Context) {
 	var pedido domain.Pedido

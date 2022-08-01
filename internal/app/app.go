@@ -174,7 +174,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	{
 		productoGroup.GET("/:idPedido", app.PedidoController.GetByID)
 		productoGroup.GET("/byCliente/:idCliente", app.PedidoController.GetAllPedidosByIDCliente)
-		productoGroup.POST("", app.PedidoController.AddPedido)
+		//productoGroup.POST("", app.PedidoController.AddPedido)
 		productoGroup.GET("/getAll", app.PedidoController.GetAll)
 		productoGroup.DELETE("/:idPedido", app.PedidoController.DeletePedido)
 		productoGroup.PUT("", app.PedidoController.UpdatePedido)

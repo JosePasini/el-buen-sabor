@@ -11,6 +11,7 @@ type ILoginRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, usuario Usuario) error
 	GetHash(ctx context.Context, tx *sqlx.Tx, email string) (string, error)
 	GetAllUsuarios(ctx context.Context, tx *sqlx.Tx) ([]UsuarioResponse, error)
+	CantidadDeCocineros(ctx context.Context, tx *sqlx.Tx) (int, error)
 	GetUsuarioByID(ctx context.Context, tx *sqlx.Tx, id int) (UsuarioResponse, error)
 	GetUsuarioByEmail(ctx context.Context, tx *sqlx.Tx, email string) (UsuarioResponse, error)
 	DeleteUsuarioByID(ctx context.Context, tx *sqlx.Tx, id int) (bool, error)

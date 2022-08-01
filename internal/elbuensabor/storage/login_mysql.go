@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -157,4 +158,16 @@ func (i *MySQLLoginRepository) UpdateUsuario(ctx context.Context, tx *sqlx.Tx, u
 		return u, err
 	}
 	return domain.Usuario{}, err
+}
+
+func (i *MySQLLoginRepository) CantidadDeCocineros(ctx context.Context, tx *sqlx.Tx) (int, error) {
+	query := "SELECT COUNT(*) FROM usuarios WHERE rol = 300"
+	var cantidadDeCocineros int
+	row := tx.QueryRowxContext(ctx, query)
+	err := row.Scan(&cantidadDeCocineros)
+	if err != nil {
+		return 0, err
+	}
+	fmt.Println("cantidadDeCocineros", cantidadDeCocineros)
+	return cantidadDeCocineros, nil
 }

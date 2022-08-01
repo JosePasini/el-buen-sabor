@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -18,7 +19,7 @@ type IPedidoService interface {
 	UpdatePedido(context.Context, domain.Pedido) error
 	UpdateEstadoPedido(context.Context, int, int) error
 	DeletePedido(context.Context, int) error
-	AddPedido(context.Context, domain.Pedido) error
+	//AddPedido(context.Context, domain.Pedido) error
 	GenerarPedido(context.Context, domain.GenerarPedido) (domain.GenerarPedido, error)
 	AceptarPedido(context.Context, int) (bool, error)
 	VerificarStock(context.Context, int, int, bool) (bool, error)
@@ -32,10 +33,11 @@ type PedidoService struct {
 	db                database.DB
 	repository        storage.IPedidoRepository
 	repositoryFactura domain.IFacturaRepository
+	repositoryLogin   domain.ILoginRepository
 }
 
-func NewPedidoService(db database.DB, repository storage.IPedidoRepository, repositoryFactura domain.IFacturaRepository) *PedidoService {
-	return &PedidoService{db, repository, repositoryFactura}
+func NewPedidoService(db database.DB, repository storage.IPedidoRepository, repositoryFactura domain.IFacturaRepository, repositoryLogin domain.ILoginRepository) *PedidoService {
+	return &PedidoService{db, repository, repositoryFactura, repositoryLogin}
 }
 
 func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
@@ -161,25 +163,46 @@ func (s *PedidoService) DeletePedido(ctx context.Context, id int) error {
 	return err
 }
 
-func (s *PedidoService) AddPedido(ctx context.Context, pedido domain.Pedido) error {
-	var err error
-	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		_, err = s.repository.Insert(ctx, tx, pedido)
-		return err
-	})
-	return nil
-}
+// func (s *PedidoService) AddPedido(ctx context.Context, pedido domain.Pedido) error {
+// 	var err error
+// 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+// 		_, err = s.repository.Insert(ctx, tx, pedido)
+// 		return err
+// 	})
+// 	return nil
+// }
 
 func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.GenerarPedido) (domain.GenerarPedido, error) {
 	var err error
 	var pedido = generarPedido.Pedido
 	var detallePedido = generarPedido.DetallePedido
-	var idPedido int
-	var total int
+	var idPedido, total, tiempoCocinaAcum, cantidadDeCocineros, tiempoTotalEstimado int
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
-		// creamos un 'pedido' en la BD y nos retorna el ID
-		idPedido, err = s.repository.Insert(ctx, tx, pedido)
 
+		// controlamos el tiempo de demora de cada producto
+		for _, det := range detallePedido {
+			if det.TiempoEstimadoCocina != nil {
+				tiempoCocinaAcum += *det.TiempoEstimadoCocina
+				fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
+			}
+		}
+		cantidadDeCocineros, err = s.repositoryLogin.CantidadDeCocineros(ctx, tx)
+		if err != nil {
+			return err
+		}
+		if pedido.TipoEnvio == domain.ENVIO_DELIVERY {
+			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros) + 10
+		} else {
+			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros)
+		}
+		fmt.Println("cantidadDeCocineros service", cantidadDeCocineros)
+		fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
+		fmt.Println("tiempoTotalEstimado:", tiempoTotalEstimado)
+		// creamos un 'pedido' en la BD y nos retorna el ID
+		idPedido, err = s.repository.Insert(ctx, tx, pedido, tiempoTotalEstimado)
+		//fechaActual := time.Now()
+
+		fmt.Println("time.Now():", time.Now())
 		// insertamos todos los detalles con el ID de pedido.
 		if len(detallePedido) > 0 {
 			for _, detalle := range detallePedido {

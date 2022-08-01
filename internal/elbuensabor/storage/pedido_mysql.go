@@ -19,7 +19,7 @@ var (
 )
 
 type IPedidoRepository interface {
-	Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) (int, error)
+	Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido, minutosDemoraCocina int) (int, error)
 	//InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, detalle_pedido domain.DetallePedido) error
 	InsertDetallePedido(ctx context.Context, tx *sqlx.Tx, carrito_completo domain.CarritoCompleto) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*domain.Pedido, error)
@@ -91,7 +91,7 @@ type MySQLPedidoRepository struct {
 
 func NewMySQLPedidoRepository() *MySQLPedidoRepository {
 	return &MySQLPedidoRepository{
-		qInsert:     "INSERT INTO pedidos (estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente) VALUES (?,?,?,?,?,?,?);",
+		qInsert:     "INSERT INTO pedidos (estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente) VALUES (?,DATE_ADD(?,INTERVAL ? MINUTE),?,?,?,?,?);",
 		qGetByID:    "SELECT id, estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente FROM pedidos WHERE id = ?",
 		qGetAll:     "SELECT id, estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente FROM pedidos",
 		qDeleteById: "DELETE FROM pedidos WHERE id = ?",
@@ -126,9 +126,12 @@ func (i *MySQLPedidoRepository) Delete(ctx context.Context, tx *sqlx.Tx, id int)
 	return err
 }
 
-func (i *MySQLPedidoRepository) Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) (int, error) {
+func (i *MySQLPedidoRepository) Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido, minutosDemoraCocina int) (int, error) {
 	query := i.qInsert
-	sql, err := tx.ExecContext(ctx, query, pedido.Estado, pedido.HoraEstimadaFin, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
+	fmt.Println("Time Now ::::", time.Now())
+	fmt.Println("minutosDemoraCocina ::::", minutosDemoraCocina)
+	NOW := time.Now()
+	sql, err := tx.ExecContext(ctx, query, pedido.Estado, NOW, minutosDemoraCocina, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
 	if err != nil {
 		return 0, err
 	}
