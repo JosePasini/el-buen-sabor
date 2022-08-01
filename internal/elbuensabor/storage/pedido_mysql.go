@@ -130,7 +130,7 @@ func (i *MySQLPedidoRepository) Delete(ctx context.Context, tx *sqlx.Tx, id int)
 
 func (i *MySQLPedidoRepository) Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido, minutosDemoraCocina int) (int, error) {
 	query := i.qInsert
-	sql, err := tx.ExecContext(ctx, query, pedido.Estado, time.Now(), minutosDemoraCocina, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
+	sql, err := tx.ExecContext(ctx, query, pedido.Estado, minutosDemoraCocina, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
 	if err != nil {
 		return 0, err
 	}
