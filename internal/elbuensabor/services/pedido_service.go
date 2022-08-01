@@ -212,7 +212,8 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 				err = s.repository.InsertDetallePedido(ctx, tx, detalle)
 				if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
 					//totalFloat = totalFloat * 0.9
-					totalFloat += (detalle.SubTotal * 0.9) * float64(detalle.Cantidad)
+					detalle.SubTotal = detalle.SubTotal * 0.9
+					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
 					//total += int(detalle.SubTotal) * detalle.Cantidad
 				} else {
 					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
