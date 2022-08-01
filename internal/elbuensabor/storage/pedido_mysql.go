@@ -91,7 +91,9 @@ type MySQLPedidoRepository struct {
 
 func NewMySQLPedidoRepository() *MySQLPedidoRepository {
 	return &MySQLPedidoRepository{
-		qInsert:     "INSERT INTO pedidos (estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente) VALUES (?,DATE_ADD(?,INTERVAL ? MINUTE),?,?,?,?,?);",
+		//qInsert:     "INSERT INTO pedidos (estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente) VALUES (?,DATE_ADD(?,INTERVAL ? MINUTE),?,?,?,?,?);",
+		// El insert de arriba es el correcto, pero como la zona horaria de heroku es en USA, tengo que restarle 3 horas. select DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 HOUR), INTERVAL 30 MINUTE);
+		qInsert:     "INSERT INTO pedidos (estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente) VALUES (?,DATE_ADD(DATE_SUB(NOW(), INTERVAL 3 HOUR), INTERVAL ? MINUTE),?,?,?,?,?);",
 		qGetByID:    "SELECT id, estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente FROM pedidos WHERE id = ?",
 		qGetAll:     "SELECT id, estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente FROM pedidos",
 		qDeleteById: "DELETE FROM pedidos WHERE id = ?",
@@ -128,10 +130,7 @@ func (i *MySQLPedidoRepository) Delete(ctx context.Context, tx *sqlx.Tx, id int)
 
 func (i *MySQLPedidoRepository) Insert(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido, minutosDemoraCocina int) (int, error) {
 	query := i.qInsert
-	fmt.Println("Time Now ::::", time.Now())
-	fmt.Println("minutosDemoraCocina ::::", minutosDemoraCocina)
-	NOW := time.Now()
-	sql, err := tx.ExecContext(ctx, query, pedido.Estado, NOW, minutosDemoraCocina, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
+	sql, err := tx.ExecContext(ctx, query, pedido.Estado, time.Now(), minutosDemoraCocina, pedido.DetalleEnvio, pedido.TipoEnvio, pedido.Total, pedido.IDDomicicio, pedido.IDCliente)
 	if err != nil {
 		return 0, err
 	}
