@@ -87,6 +87,7 @@ type MySQLFacturaRepository struct {
 	qGetAll     string
 	qDeleteById string
 	qUpdate     string
+	//qGetFacturaByIdPedido string
 }
 
 func NewMySQLFacturaRepository() *MySQLFacturaRepository {
@@ -96,6 +97,7 @@ func NewMySQLFacturaRepository() *MySQLFacturaRepository {
 		qGetAll:     "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura",
 		qDeleteById: "DELETE FROM factura WHERE id = ?",
 		qUpdate:     "UPDATE factura SET fecha = COALESCE(?,fecha), numero_factura = COALESCE(?,numero_factura) , monto_descuento = COALESCE(?,monto_descuento), forma_pago = COALESCE(?,forma_pago), numero_tarjeta = COALESCE(?,numero_tarjeta), total_venta = COALESCE(?,total_venta), total_costo = COALESCE(?,total_costo) WHERE id = ?",
+		//qGetFacturaByIdPedido: "SELECT id, fecha, numero_factura, monto_descuento, forma_pago, numero_tarjeta, total_venta, total_costo FROM factura WHERE id = ?",
 	}
 }
 
@@ -130,7 +132,44 @@ func (i *MySQLFacturaRepository) GetByID(ctx context.Context, tx *sqlx.Tx, id in
 	return &fac, nil
 }
 
+func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*domain.Factura, error) {
+	query := "SELECT * FROM factura"
+	var factura facturaDB
+
+	row := tx.QueryRowxContext(ctx, query, idPedido)
+	err := row.StructScan(&factura)
+	if err != nil {
+		return nil, err
+	}
+	fac := factura.toFactura()
+	return &fac, nil
+}
+
 func (i *MySQLFacturaRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Factura, error) {
+	fmt.Println("Repository: 1")
+	query := i.qGetAll
+	facturas := make([]domain.Factura, 0)
+	fmt.Println("Repository: 1")
+	rows, err := tx.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	fmt.Println("Repository: 2")
+
+	for rows.Next() {
+		var factura facturaDB
+		if err := rows.StructScan(&factura); err != nil {
+			return facturas, err
+		}
+		facturas = append(facturas, factura.toFactura())
+	}
+	fmt.Println("Repository: 3")
+
+	return facturas, nil
+}
+
+func (i *MySQLFacturaRepository) GetAllByCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.Factura, error) {
 	fmt.Println("Repository: 1")
 	query := i.qGetAll
 	facturas := make([]domain.Factura, 0)

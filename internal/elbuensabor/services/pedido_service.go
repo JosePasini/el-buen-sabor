@@ -49,6 +49,7 @@ func (s *PedidoService) GetAll(ctx context.Context) ([]domain.Pedido, error) {
 	})
 	return pedidos, err
 }
+
 func (s *PedidoService) GetAllPedidosByIDCliente(ctx context.Context, idCliente int) ([]domain.Pedido, error) {
 	var err error
 	var pedidos []domain.Pedido

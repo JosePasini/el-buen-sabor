@@ -18,6 +18,8 @@ var (
 type IFacturaController interface {
 	GetByID(*gin.Context)
 	GetAll(*gin.Context)
+	GetAllByCliente(*gin.Context)
+	GetByIDPedido(*gin.Context)
 	AddFactura(*gin.Context)
 	UpdateFactura(*gin.Context)
 	DeleteFactura(*gin.Context)
@@ -52,13 +54,32 @@ func (c *FacturaController) AddFactura(ctx *gin.Context) {
 	ctx.JSON(200, factura)
 }
 
-func (c *FacturaController) GetByID(ctx *gin.Context) {
-	idFactura := ctx.Param("idFactura")
+func (c *FacturaController) GetByIDPedido(ctx *gin.Context) {
+	idPedido := ctx.Param("idPedido")
 
-	if idFactura == "" {
-		ctx.JSON(400, errors.New("invalid factura"))
+	ID, err := strconv.Atoi(idPedido)
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid pedido id"))
 		return
 	}
+	factura, err := c.service.GetByIDPedido(ctx, ID)
+	if err != nil {
+		if err.Error() == errInternal.Error() {
+			ctx.JSON(404, gin.H{
+				"message": "factura not found",
+			})
+			return
+		}
+	}
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, factura)
+}
+
+func (c *FacturaController) GetByID(ctx *gin.Context) {
+	idFactura := ctx.Param("idFactura")
 
 	ID, err := strconv.Atoi(idFactura)
 	if err != nil {
@@ -79,11 +100,25 @@ func (c *FacturaController) GetByID(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, factura)
-
 }
 
 func (c *FacturaController) GetAll(ctx *gin.Context) {
 	facturas, err := c.service.GetAll(ctx)
+	if err != nil {
+		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
+		return
+	}
+	ctx.JSON(200, facturas)
+}
+func (c *FacturaController) GetAllByCliente(ctx *gin.Context) {
+	idParam := ctx.Param("idCliente")
+
+	idCliente, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(400, errors.New("invalid factura id"))
+		return
+	}
+	facturas, err := c.service.GetAllByCliente(ctx, idCliente)
 	if err != nil {
 		ctx.JSON(500, errors.New("Error internal server error: "+err.Error()))
 		return

@@ -175,7 +175,7 @@ func (i *MySQLPedidoRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]doma
 }
 
 func (i *MySQLPedidoRepository) GetAllPedidosByIDCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.Pedido, error) {
-	queryGetPedidosByCliente := `SELECT * FROM pedidos
+	queryGetPedidosByCliente := `SELECT id, estado, hora_estimada_fin, detalle_envio, tipo_envio, total, id_domicilio, id_cliente FROM pedidos
     	WHERE id_cliente = ?;`
 
 	pedidos := make([]domain.Pedido, 0)

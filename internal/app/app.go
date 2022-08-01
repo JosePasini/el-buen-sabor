@@ -95,7 +95,7 @@ func NewApp() (*App, error) {
 
 func controlHorarios(ctx *gin.Context) {
 	now := time.Now()
-	if now.Hour() <= 20 || now.Hour() >= 24 {
+	if now.Hour() < 20 || now.Hour() >= 24 {
 		ctx.AbortWithStatusJSON(405, "comercio cerrado de 20 a 24 hs (horario Argentina). lo esperamos en ese horario. saludos")
 		return
 	} else {
@@ -179,6 +179,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 		instrumentoGroup.GET("/getAll", app.FacturaController.GetAll)
 		instrumentoGroup.DELETE("/:idFactura", app.FacturaController.DeleteFactura)
 		instrumentoGroup.PUT("", app.FacturaController.UpdateFactura)
+		instrumentoGroup.GET("/getByPedido/:idPedido", app.FacturaController.GetByIDPedido)
+		instrumentoGroup.GET("/getAllByCliente/:idCliente", app.FacturaController.GetAllByCliente)
 	}
 
 	productoGroup := router.Group("/pedido")

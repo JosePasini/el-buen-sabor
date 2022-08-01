@@ -12,10 +12,13 @@ import (
 
 type IFacturaService interface {
 	GetAll(context.Context) ([]domain.Factura, error)
+	GetAllByCliente(context.Context, int) ([]domain.Factura, error)
 	GetByID(context.Context, int) (*domain.Factura, error)
+	GetByIDPedido(context.Context, int) (*domain.Factura, error)
 	UpdateFactura(context.Context, domain.Factura) error
 	DeleteFactura(context.Context, int) error
 	AddFactura(context.Context, domain.Factura) error
+	// Reportes y Excel
 	RecaudacionesDiarias(context.Context, string) ([]domain.Recaudaciones, error)
 	RecaudacionesMensuales(context.Context, string, string) ([]domain.Recaudaciones, error)
 	RecaudacionesPeriodoTiempo(context.Context, string, string) ([]domain.RecaudacionesResponse, error)
@@ -40,6 +43,18 @@ func (s *FacturaService) UpdateFactura(ctx context.Context, factura domain.Factu
 	return err
 }
 
+func (s *FacturaService) GetByIDPedido(ctx context.Context, idPedido int) (*domain.Factura, error) {
+	var err error
+	var factura *domain.Factura
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		factura, err = s.repository.GetByIDPedido(ctx, tx, idPedido)
+		if err != nil {
+			return errors.New("internal server error")
+		}
+		return err
+	})
+	return factura, err
+}
 func (s *FacturaService) GetByID(ctx context.Context, id int) (*domain.Factura, error) {
 	var err error
 	var factura *domain.Factura
@@ -69,6 +84,18 @@ func (s *FacturaService) GetAll(ctx context.Context) ([]domain.Factura, error) {
 	fmt.Println("factura services 1")
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		facturas, err = s.repository.GetAll(ctx, tx)
+		return err
+	})
+	fmt.Println("[]factura:", facturas)
+	return facturas, err
+}
+
+func (s *FacturaService) GetAllByCliente(ctx context.Context, idCliente int) ([]domain.Factura, error) {
+	var err error
+	var facturas []domain.Factura
+	fmt.Println("factura services 1")
+	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
+		facturas, err = s.repository.GetAllByCliente(ctx, tx, idCliente)
 		return err
 	})
 	fmt.Println("[]factura:", facturas)
