@@ -127,9 +127,9 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 			if err != nil {
 				return err
 			}
-			if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
-				descuento = pedido.Total * 0.1
-			}
+			// if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+			// 	descuento = pedido.Total * 0.1
+			// }
 			factura := domain.Factura{
 				MontoDescuento: &descuento,
 				FormaPago:      pedido.DetalleEnvio,
@@ -200,7 +200,15 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
 		fmt.Println("tiempoTotalEstimado:", tiempoTotalEstimado)
 
+		// Verificamos si es 'Retiro en el Local' se aplica el 10% de descuento.
+		totalFloat := float64(total)
+		if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+			totalFloat = pedido.Total * 0.1
+		}
+		pedido.Total = totalFloat
+
 		// creamos un 'pedido' en la BD y nos retorna el ID
+
 		idPedido, err = s.repository.Insert(ctx, tx, pedido, tiempoTotalEstimado)
 		fmt.Println("time.Now():", time.Now())
 
