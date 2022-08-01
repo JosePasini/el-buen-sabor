@@ -177,7 +177,7 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 	var err error
 	var pedido = generarPedido.Pedido
 	var detallePedido = generarPedido.DetallePedido
-	var idPedido, total, tiempoCocinaAcum, cantidadDeCocineros, tiempoTotalEstimado int
+	var idPedido, tiempoCocinaAcum, cantidadDeCocineros, tiempoTotalEstimado int
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 
 		// controlamos el tiempo de demora de cada producto
@@ -205,11 +205,18 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		fmt.Println("time.Now():", time.Now())
 
 		// insertamos todos los detalles con el ID de pedido.
+		var totalFloat float64
 		if len(detallePedido) > 0 {
 			for _, detalle := range detallePedido {
 				detalle.IDPedido = idPedido
 				err = s.repository.InsertDetallePedido(ctx, tx, detalle)
-				total += int(detalle.SubTotal) * detalle.Cantidad
+				if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+					//totalFloat = totalFloat * 0.9
+					totalFloat += (detalle.SubTotal * 0.9) * float64(detalle.Cantidad)
+					//total += int(detalle.SubTotal) * detalle.Cantidad
+				} else {
+					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
+				}
 				if err != nil {
 					return err
 				}
@@ -217,10 +224,10 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		}
 
 		// Verificamos si es 'Retiro en el Local' se aplica el 10% de descuento.
-		totalFloat := float64(total)
-		if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
-			totalFloat = totalFloat * 0.9
-		}
+		// totalFloat := float64(total)
+		// if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+		// 	totalFloat = totalFloat * 0.9
+		// }
 		// updateamos el pedido con el total final.
 		err = s.repository.UpdateTotal(ctx, tx, totalFloat, idPedido)
 		return err
