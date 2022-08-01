@@ -50,4 +50,5 @@ type CarritoCompleto struct {
 	Imagen               *string  `json:"imagen"`
 	EsBebida             bool     `json:"es_bebida"`
 	TiempoEstimadoCocina *int     `json:"tiempo_estimado"`
+	IDCategoria          *int     `json:"id_categoria"`
 }

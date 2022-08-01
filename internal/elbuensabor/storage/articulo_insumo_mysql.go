@@ -45,6 +45,7 @@ type carritoCompletoDB struct {
 	Imagen               sql.NullString  `db:"imagen"`
 	EsBebida             bool            `json:"es_bebida"`
 	TiempoEstimadoCocina sql.NullInt32   `db:"tiempo_estimado_cocina"`
+	IDCategoria          sql.NullInt32   `db:"id_categoria"`
 }
 
 func (a *carritoCompletoDB) toCarritoCompleto() domain.CarritoCompleto {
@@ -59,6 +60,7 @@ func (a *carritoCompletoDB) toCarritoCompleto() domain.CarritoCompleto {
 		Imagen:               database.ToStringP(a.Imagen),
 		EsBebida:             a.EsBebida,
 		TiempoEstimadoCocina: database.ToIntP(a.TiempoEstimadoCocina),
+		IDCategoria:          database.ToIntP(a.IDCategoria),
 	}
 }
 
@@ -131,7 +133,7 @@ func (i *MySQLArticuloInsumoRepository) GetAll(ctx context.Context, tx *sqlx.Tx)
 }
 
 func (i *MySQLArticuloInsumoRepository) GetAllCarritoCompleto(ctx context.Context, tx *sqlx.Tx) ([]domain.CarritoCompleto, error) {
-	queryBebidas := `select id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, imagen 
+	queryBebidas := `SELECT id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, imagen, id_categoria
 		FROM articulo_insumo WHERE es_insumo = false AND stock_actual > 0;`
 	carritoCompleto := make([]domain.CarritoCompleto, 0)
 	rows, err := tx.QueryxContext(ctx, queryBebidas)
@@ -158,7 +160,7 @@ func (i *MySQLArticuloInsumoRepository) GetAllCarritoCompleto(ctx context.Contex
 	/*
 		queryPlatos := `select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;`
 	*/
-	queryPlatos := `select id, tiempo_estimado_cocina, denominacion, precio_venta, imagen from articulo_manufacturado;`
+	queryPlatos := `SELECT id, tiempo_estimado_cocina, denominacion, precio_venta, imagen, id_categoria FROM articulo_manufacturado;`
 	rows, err = tx.QueryxContext(ctx, queryPlatos)
 	if err != nil {
 		return nil, err
