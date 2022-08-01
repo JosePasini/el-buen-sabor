@@ -31,7 +31,7 @@ type IPedidoRepository interface {
 	Update(ctx context.Context, tx *sqlx.Tx, pedido domain.Pedido) error
 	Delete(ctx context.Context, tx *sqlx.Tx, id int) error
 	CancelarPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) error
-	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error
+	UpdateTotal(ctx context.Context, tx *sqlx.Tx, total float64, id int) error
 	DescontarStock(ctx context.Context, tx *sqlx.Tx, idPedido, estado int) (bool, error)
 	UpdateEstadoPedido(ctx context.Context, tx *sqlx.Tx, estado, IDPedido int) error
 	RankingComidasMasPedidas(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]domain.RankingComidasMasPedidas, error)
@@ -116,7 +116,7 @@ func (i *MySQLPedidoRepository) UpdateEstadoPedido(ctx context.Context, tx *sqlx
 	return err
 }
 
-func (i *MySQLPedidoRepository) UpdateTotal(ctx context.Context, tx *sqlx.Tx, total, id int) error {
+func (i *MySQLPedidoRepository) UpdateTotal(ctx context.Context, tx *sqlx.Tx, total float64, id int) error {
 	query := "UPDATE pedidos SET total = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, query, total, id)
 	return err

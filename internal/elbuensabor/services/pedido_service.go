@@ -200,15 +200,7 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
 		fmt.Println("tiempoTotalEstimado:", tiempoTotalEstimado)
 
-		// Verificamos si es 'Retiro en el Local' se aplica el 10% de descuento.
-		totalFloat := float64(total)
-		if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
-			totalFloat = pedido.Total * 0.1
-		}
-		pedido.Total = totalFloat
-
 		// creamos un 'pedido' en la BD y nos retorna el ID
-
 		idPedido, err = s.repository.Insert(ctx, tx, pedido, tiempoTotalEstimado)
 		fmt.Println("time.Now():", time.Now())
 
@@ -224,8 +216,13 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 			}
 		}
 
+		// Verificamos si es 'Retiro en el Local' se aplica el 10% de descuento.
+		totalFloat := float64(total)
+		if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+			totalFloat = totalFloat * 0.9
+		}
 		// updateamos el pedido con el total final.
-		err = s.repository.UpdateTotal(ctx, tx, total, idPedido)
+		err = s.repository.UpdateTotal(ctx, tx, totalFloat, idPedido)
 		return err
 	})
 	if err != nil {
