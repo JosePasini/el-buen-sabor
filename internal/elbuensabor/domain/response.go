@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type UsuarioResponse struct {
 	ID       int     `json:"id"`
 	Nombre   *string `json:"nombre"`
@@ -47,4 +49,28 @@ type RecaudacionesResponse struct {
 	FormaPago     *string  `json:"forma_pago" db:"forma_pago"`
 	Recaudaciones *float64 `json:"recaudaciones" db:"recaudaciones"`
 	IDPedido      *int     `json:"id_pedido" db:"id_pedido"`
+}
+
+type FacturaResponse struct {
+	//FacturaAuxResponse FacturaAuxResponse `json:"factura"`
+	Fecha      *string          `json:"fecha" db:"fecha"`
+	FormaPago  *string          `json:"forma_pago" db:"forma_pago"`
+	TotalVenta *float64         `json:"total_venta" db:"total_venta"`
+	Calle      *string          `json:"calle" db:"calle"`
+	Numero     *int             `json:"numero" db:"numero"`
+	Localidad  *string          `json:"localidad" db:"localidad"`
+	Productos  []PedidoResponse `json:"productos"`
+}
+
+type FacturaAuxResponse struct {
+	Domicilio *string   `json:"domicilio" db:"domicilio"`
+	Pago      *string   `json:"pago" db:"pago"`
+	Fecha     time.Time `json:"fecha" db:"fecha"`
+	Total     *float64  `json:"total" db:"total"`
+}
+
+type PedidoResponse struct {
+	Cantidad       *int     `json:"cantidad" db:"cantidad"`
+	Denominacion   *string  `json:"denominacion" db:"denominacion"`
+	PrecioUnitario *float64 `json:"precio" db:"precio"`
 }

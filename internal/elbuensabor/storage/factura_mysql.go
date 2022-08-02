@@ -132,19 +132,6 @@ func (i *MySQLFacturaRepository) GetByID(ctx context.Context, tx *sqlx.Tx, id in
 	return &fac, nil
 }
 
-func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*domain.Factura, error) {
-	query := "SELECT * FROM factura"
-	var factura facturaDB
-
-	row := tx.QueryRowxContext(ctx, query, idPedido)
-	err := row.StructScan(&factura)
-	if err != nil {
-		return nil, err
-	}
-	fac := factura.toFactura()
-	return &fac, nil
-}
-
 func (i *MySQLFacturaRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]domain.Factura, error) {
 	fmt.Println("Repository: 1")
 	query := i.qGetAll
@@ -169,12 +156,122 @@ func (i *MySQLFacturaRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]dom
 	return facturas, nil
 }
 
-func (i *MySQLFacturaRepository) GetAllByCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.Factura, error) {
+type facturaResponseDB struct {
+	Fecha      sql.NullString  `json:"fecha" db:"fecha"`
+	FormaPago  sql.NullString  `json:"forma_pago" db:"forma_pago"`
+	TotalVenta sql.NullFloat64 `json:"total_venta" db:"total_venta"`
+	Calle      sql.NullString  `json:"calle" db:"calle"`
+	Numero     sql.NullInt32   `json:"numero" db:"numero"`
+	Localidad  sql.NullString  `json:"localidad" db:"localidad"`
+}
+
+func (i *facturaResponseDB) toFacturaResponse() domain.FacturaResponse {
+	return domain.FacturaResponse{
+		Fecha:      database.ToStringP(i.Fecha),
+		FormaPago:  database.ToStringP(i.FormaPago),
+		TotalVenta: database.ToFloat64P(i.TotalVenta),
+		Calle:      database.ToStringP(i.Calle),
+		Numero:     database.ToIntP(i.Numero),
+		Localidad:  database.ToStringP(i.Localidad),
+	}
+}
+
+type pedidosResponseDB struct {
+	Cantidad       sql.NullInt32   `json:"cantidad" db:"cantidad"`
+	Denominacion   sql.NullString  `json:"denominacion" db:"denominacion"`
+	PrecioUnitario sql.NullFloat64 `json:"precio" db:"precio"`
+}
+
+func (i *pedidosResponseDB) toPedidosResponse() domain.PedidoResponse {
+	return domain.PedidoResponse{
+		Cantidad:       database.ToIntP(i.Cantidad),
+		Denominacion:   database.ToStringP(i.Denominacion),
+		PrecioUnitario: database.ToFloat64P(i.PrecioUnitario),
+	}
+}
+
+func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*domain.FacturaResponse, error) {
+	query := `select f.fecha, f.forma_pago, f.total_venta, d.calle, d.numero, d.localidad from factura f 
+		JOIN pedidos p ON p.id = f.id_pedido
+		JOIN usuarios u ON u.id = p.id_cliente 
+		JOIN domicilio d ON d.id_usuario = u.id
+		WHERE f.id_pedido = ?;`
+	var facturaResponse domain.FacturaResponse
+	rows, err := tx.QueryxContext(ctx, query, idPedido)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var factura facturaResponseDB
+		if err := rows.StructScan(&factura); err != nil {
+			return &domain.FacturaResponse{}, err
+		}
+		facturaResponse = factura.toFacturaResponse()
+	}
+
+	var bebidas []domain.PedidoResponse
+	var comidas []domain.PedidoResponse
+	qGetBebidas := `SELECT dp.cantidad, am.denominacion, dp.subtotal AS precio FROM articulo_manufacturado am
+			JOIN detalle_pedidos dp ON dp.id_articulo_manufacturado = am.id
+			JOIN pedidos p ON p.id = dp.id_pedido
+			WHERE p.id = ?`
+
+	rows, err = tx.QueryxContext(ctx, qGetBebidas, idPedido)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	fmt.Println("22222")
+
+	for rows.Next() {
+		var pedido pedidosResponseDB
+		if err := rows.StructScan(&pedido); err != nil {
+			return &facturaResponse, err
+		}
+		bebidas = append(bebidas, pedido.toPedidosResponse())
+	}
+	if len(bebidas) > 0 {
+		facturaResponse.Productos = append(facturaResponse.Productos, bebidas...)
+	}
+
+	qGetComidas := `SELECT dp.cantidad, ai.denominacion, dp.subtotal AS precio FROM articulo_insumo ai
+			JOIN detalle_pedidos dp ON dp.id_articulo_insumo = ai.id
+    		JOIN pedidos p ON p.id = dp.id_pedido
+    		WHERE p.id = ?`
+	rows, err = tx.QueryxContext(ctx, qGetComidas, idPedido)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	fmt.Println("333333")
+
+	for rows.Next() {
+		var pedido pedidosResponseDB
+		if err := rows.StructScan(&pedido); err != nil {
+			return &facturaResponse, err
+		}
+		comidas = append(comidas, pedido.toPedidosResponse())
+	}
+	if len(comidas) > 0 {
+		facturaResponse.Productos = append(facturaResponse.Productos, comidas...)
+	}
+	fmt.Println("Facturas::::", facturaResponse)
+	return &facturaResponse, nil
+}
+
+func (i *MySQLFacturaRepository) GetAllByCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]domain.FacturaResponse, error) {
+
 	fmt.Println("Repository: 1")
-	query := i.qGetAll
-	facturas := make([]domain.Factura, 0)
+	query := `select f.fecha, f.forma_pago, f.total_venta, d.calle, d.numero, d.localidad from factura f 
+		JOIN pedidos p ON p.id = f.id_pedido
+		JOIN usuarios u ON u.id = p.id_cliente 
+		JOIN domicilio d ON d.id_usuario = u.id
+		WHERE f.id_pedido = ?;`
+
+	facturas := make([]domain.FacturaResponse, 0)
 	fmt.Println("Repository: 1")
-	rows, err := tx.QueryxContext(ctx, query)
+	rows, err := tx.QueryxContext(ctx, query, idCliente)
 	if err != nil {
 		return nil, err
 	}
@@ -182,14 +279,14 @@ func (i *MySQLFacturaRepository) GetAllByCliente(ctx context.Context, tx *sqlx.T
 	fmt.Println("Repository: 2")
 
 	for rows.Next() {
-		var factura facturaDB
+		var factura facturaResponseDB
 		if err := rows.StructScan(&factura); err != nil {
 			return facturas, err
 		}
-		facturas = append(facturas, factura.toFactura())
+		facturas = append(facturas, factura.toFacturaResponse())
 	}
 	fmt.Println("Repository: 3")
-
+	fmt.Println("Facturas::::", facturas)
 	return facturas, nil
 }
 

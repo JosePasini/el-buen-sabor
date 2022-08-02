@@ -12,9 +12,9 @@ import (
 
 type IFacturaService interface {
 	GetAll(context.Context) ([]domain.Factura, error)
-	GetAllByCliente(context.Context, int) ([]domain.Factura, error)
+	GetAllByCliente(context.Context, int) ([]domain.FacturaResponse, error)
 	GetByID(context.Context, int) (*domain.Factura, error)
-	GetByIDPedido(context.Context, int) (*domain.Factura, error)
+	GetByIDPedido(context.Context, int) (*domain.FacturaResponse, error)
 	UpdateFactura(context.Context, domain.Factura) error
 	DeleteFactura(context.Context, int) error
 	AddFactura(context.Context, domain.Factura) error
@@ -43,9 +43,9 @@ func (s *FacturaService) UpdateFactura(ctx context.Context, factura domain.Factu
 	return err
 }
 
-func (s *FacturaService) GetByIDPedido(ctx context.Context, idPedido int) (*domain.Factura, error) {
+func (s *FacturaService) GetByIDPedido(ctx context.Context, idPedido int) (*domain.FacturaResponse, error) {
 	var err error
-	var factura *domain.Factura
+	var factura *domain.FacturaResponse
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		factura, err = s.repository.GetByIDPedido(ctx, tx, idPedido)
 		if err != nil {
@@ -90,9 +90,9 @@ func (s *FacturaService) GetAll(ctx context.Context) ([]domain.Factura, error) {
 	return facturas, err
 }
 
-func (s *FacturaService) GetAllByCliente(ctx context.Context, idCliente int) ([]domain.Factura, error) {
+func (s *FacturaService) GetAllByCliente(ctx context.Context, idCliente int) ([]domain.FacturaResponse, error) {
 	var err error
-	var facturas []domain.Factura
+	var facturas []domain.FacturaResponse
 	fmt.Println("factura services 1")
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
 		facturas, err = s.repository.GetAllByCliente(ctx, tx, idCliente)

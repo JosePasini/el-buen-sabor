@@ -210,10 +210,8 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 			for _, detalle := range detallePedido {
 				detalle.IDPedido = idPedido
 				if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
-					//totalFloat = totalFloat * 0.9
 					detalle.SubTotal = detalle.SubTotal * 0.9
 					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
-					//total += int(detalle.SubTotal) * detalle.Cantidad
 				} else {
 					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
 				}
@@ -224,11 +222,6 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 			}
 		}
 
-		// Verificamos si es 'Retiro en el Local' se aplica el 10% de descuento.
-		// totalFloat := float64(total)
-		// if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
-		// 	totalFloat = totalFloat * 0.9
-		// }
 		// updateamos el pedido con el total final.
 		err = s.repository.UpdateTotal(ctx, tx, totalFloat, idPedido)
 		return err

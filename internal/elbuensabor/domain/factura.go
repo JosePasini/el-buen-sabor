@@ -9,9 +9,9 @@ import (
 type IFacturaRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, factura Factura) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*Factura, error)
-	GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*Factura, error)
+	GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*FacturaResponse, error)
 	GetAll(ctx context.Context, tx *sqlx.Tx) ([]Factura, error)
-	GetAllByCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]Factura, error)
+	GetAllByCliente(ctx context.Context, tx *sqlx.Tx, idCliente int) ([]FacturaResponse, error)
 	RecaudacionesDiarias(ctx context.Context, tx *sqlx.Tx, fecha string) ([]Recaudaciones, error)
 	RecaudacionesMensuales(ctx context.Context, tx *sqlx.Tx, month, year string) ([]Recaudaciones, error)
 	RecaudacionesPeriodoTiempo(ctx context.Context, tx *sqlx.Tx, desde, hasta string) ([]RecaudacionesResponse, error)
