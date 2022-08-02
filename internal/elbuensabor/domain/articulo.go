@@ -9,6 +9,7 @@ type ArticuloInsumo struct {
 	StockMinimo  *int     `json:"stock_minimo"`
 	UnidadMedida *string  `json:"unidad_medida"`
 	EsInsumo     *bool    `json:"es_insumo"`
+	Imagen       *string  `json:"imagen"`
 }
 
 type ArticuloManufacturadoDetalle struct {

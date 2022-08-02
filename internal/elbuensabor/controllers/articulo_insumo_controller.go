@@ -84,7 +84,7 @@ func (c *ArticuloInsumoController) AddArticuloInsumo(ctx *gin.Context) {
 		return
 	}
 	fmt.Println("articuloInsumo:", articuloInsumo)
-	fmt.Printf("%v", articuloInsumo)
+
 	err = c.service.AddArticuloInsumo(ctx, articuloInsumo)
 	if err != nil {
 		ctx.JSON(400, errors.New("error internal server"))

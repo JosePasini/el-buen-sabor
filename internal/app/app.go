@@ -1,8 +1,12 @@
 package app
 
 import (
+	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
@@ -104,6 +108,27 @@ func controlHorarios(ctx *gin.Context) {
 	}
 }
 
+func uploader(ctx *gin.Context) {
+	r := ctx.Request
+	r.ParseMultipartForm(2000)
+	file, fileInfo, err := r.FormFile("archivo")
+
+	f, err := os.OpenFile("./files/"+fileInfo.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		ctx.JSON(500, "error cargando el archivo")
+		log.Fatal("error al cargar el archivo")
+		return
+	}
+	defer f.Close()
+	io.Copy(f, file)
+	fmt.Println("File:", file)
+	fmt.Println("fileInfo:", fileInfo)
+	//imagenResponse := strings.Trim(fileInfo.Filename, " ")
+	strings.Join(strings.Fields(strings.TrimSpace(fileInfo.Filename)), " ")
+	fmt.Println("::", strings.Join(strings.Fields(strings.TrimSpace(fileInfo.Filename)), " "))
+	ctx.JSON(200, fileInfo.Filename)
+}
+
 func (app *App) RegisterRoutes(router *gin.Engine) {
 
 	router.Use(cors.New(cors.Config{
@@ -117,6 +142,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 			"message": "pong",
 		})
 	})
+
+	router.POST("/files", uploader)
 
 	register := router.Group("/register")
 	{
@@ -206,8 +233,8 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	articuloManufacturadoDetalle := router.Group("/articulo-manufacturado-detalle")
 	{
 		articuloManufacturadoDetalle.GET("/:id", app.ArticuloManufacturadoDetalleController.GetByID)
-		articuloManufacturadoDetalle.POST("", app.ArticuloManufacturadoDetalleController.AddArticuloManufacturadoDetalle)
-		articuloManufacturadoDetalle.GET("/getAll", app.ArticuloManufacturadoDetalleController.GetAll)
+		articuloManufacturadoDetalle.POST("", uploader, app.ArticuloManufacturadoDetalleController.AddArticuloManufacturadoDetalle)
+		articuloManufacturadoDetalle.GET("/getAll", uploader, app.ArticuloManufacturadoDetalleController.GetAll)
 		articuloManufacturadoDetalle.DELETE("/:id", app.ArticuloManufacturadoDetalleController.DeleteArticuloManufacturadoDetalle)
 		articuloManufacturadoDetalle.PUT("", app.ArticuloManufacturadoDetalleController.UpdateArticuloManufacturadoDetalle)
 	}

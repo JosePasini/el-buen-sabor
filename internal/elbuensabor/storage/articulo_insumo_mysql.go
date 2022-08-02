@@ -19,6 +19,7 @@ type articuloInsumoDB struct {
 	StockMinimo  sql.NullInt32   `db:"stock_minimo"`
 	UnidadMedida sql.NullString  `db:"unidad_medida"`
 	EsInsumo     sql.NullBool    `db:"es_insumo"`
+	Imagen       sql.NullString  `db:"imagen"`
 }
 
 func (a *articuloInsumoDB) toArticuloInsumo() domain.ArticuloInsumo {
@@ -31,6 +32,7 @@ func (a *articuloInsumoDB) toArticuloInsumo() domain.ArticuloInsumo {
 		StockMinimo:  database.ToIntP(a.StockMinimo),
 		UnidadMedida: database.ToStringP(a.UnidadMedida),
 		EsInsumo:     database.ToBoolP(a.EsInsumo),
+		Imagen:       database.ToStringP(a.Imagen),
 	}
 }
 
@@ -85,7 +87,7 @@ type MySQLArticuloInsumoRepository struct {
 //art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.UnidadMedida, art.EsInsumo, art.ID
 func NewMySQLArticuloInsumoRepository() *MySQLArticuloInsumoRepository {
 	return &MySQLArticuloInsumoRepository{
-		qInsert:     "INSERT INTO articulo_insumo (denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo) VALUES (?,?,?,?,?,?,?)",
+		qInsert:     "INSERT INTO articulo_insumo (denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo, imagen) VALUES (?,?,?,?,?,?,?,(replace(?, ' ', '')))",
 		qGetByID:    "SELECT id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo FROM articulo_insumo WHERE id = ?",
 		qGetAll:     "SELECT id, denominacion, precio_compra, precio_venta, stock_actual, stock_minimo, unidad_medida, es_insumo FROM articulo_insumo",
 		qDeleteById: "DELETE FROM articulo_insumo WHERE id = ?",
@@ -95,7 +97,7 @@ func NewMySQLArticuloInsumoRepository() *MySQLArticuloInsumoRepository {
 
 func (i *MySQLArticuloInsumoRepository) Insert(ctx context.Context, tx *sqlx.Tx, art domain.ArticuloInsumo) error {
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.EsInsumo)
+	_, err := tx.ExecContext(ctx, query, art.Denominacion, art.PrecioCompra, art.PrecioVenta, art.StockActual, art.StockMinimo, art.UnidadMedida, art.EsInsumo, art.Imagen)
 	return err
 }
 
