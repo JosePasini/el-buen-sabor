@@ -53,6 +53,8 @@ type RecaudacionesResponse struct {
 
 type FacturaResponse struct {
 	//FacturaAuxResponse FacturaAuxResponse `json:"factura"`
+	IDFactura  *int             `json:"id_factura" db:"id_factura"`
+	Descuento  *float64         `json:"descuentos" db:"descuentos"`
 	Fecha      *string          `json:"fecha" db:"fecha"`
 	FormaPago  *string          `json:"forma_pago" db:"forma_pago"`
 	TotalVenta *float64         `json:"total_venta" db:"total_venta"`

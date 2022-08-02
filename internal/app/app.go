@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor"
@@ -122,10 +121,7 @@ func uploader(ctx *gin.Context) {
 	defer f.Close()
 	io.Copy(f, file)
 	fmt.Println("File:", file)
-	fmt.Println("fileInfo:", fileInfo)
-	//imagenResponse := strings.Trim(fileInfo.Filename, " ")
-	strings.Join(strings.Fields(strings.TrimSpace(fileInfo.Filename)), " ")
-	fmt.Println("::", strings.Join(strings.Fields(strings.TrimSpace(fileInfo.Filename)), " "))
+	fmt.Println("fileInfo:", fileInfo.Filename)
 	ctx.JSON(200, fileInfo.Filename)
 }
 
@@ -161,7 +157,7 @@ func (app *App) RegisterRoutes(router *gin.Engine) {
 	mercadopago.GET("/metodos-de-pago", app.MercadoPagoController.MetodosDePago)
 
 	pedido := router.Group("")
-	pedido.PUT("/generar-pedido", controlHorarios, app.PedidoController.GenerarPedido)
+	pedido.PUT("/generar-pedido" /*controlHorarios,*/, app.PedidoController.GenerarPedido)
 	pedido.PUT("/aceptar-pedido/:idPedido", app.PedidoController.AceptarPedido)
 	pedido.GET("/detalle-pedido/:idPedido", app.PedidoController.GetAllDetallePedidosByIDPedido)
 	pedido.PUT("/pedido/update-estado", app.PedidoController.UpdateEstadoPedido)
