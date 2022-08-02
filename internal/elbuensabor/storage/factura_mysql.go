@@ -158,7 +158,7 @@ func (i *MySQLFacturaRepository) GetAll(ctx context.Context, tx *sqlx.Tx) ([]dom
 
 type facturaResponseDB struct {
 	IDFactura  sql.NullInt32   `json:"id_factura" db:"id_factura"`
-	Descuento  sql.NullFloat64 `json:"descuento" db:"descuento"`
+	Descuento  sql.NullFloat64 `json:"monto_descuento" db:"monto_descuento"`
 	Fecha      sql.NullString  `json:"fecha" db:"fecha"`
 	FormaPago  sql.NullString  `json:"forma_pago" db:"forma_pago"`
 	TotalVenta sql.NullFloat64 `json:"total_venta" db:"total_venta"`
@@ -195,7 +195,7 @@ func (i *pedidosResponseDB) toPedidosResponse() domain.PedidoResponse {
 }
 
 func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx, idPedido int) (*domain.FacturaResponse, error) {
-	query := `select f.id AS id_factura, f.fecha, f.forma_pago, f.total_venta, d.calle, d.numero, d.localidad from factura f 
+	query := `select f.id AS id_factura, f.monto_descuento, f.fecha, f.forma_pago, f.total_venta, d.calle, d.numero, d.localidad from factura f 
 		JOIN pedidos p ON p.id = f.id_pedido
 		JOIN usuarios u ON u.id = p.id_cliente 
 		JOIN domicilio d ON d.id_usuario = u.id
