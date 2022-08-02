@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/database"
 	"github.com/JosePasiniMercadolibre/el-buen-sabor/internal/elbuensabor/domain"
@@ -40,26 +39,26 @@ type IPedidoRepository interface {
 }
 
 type pedidoDB struct {
-	ID              int            `db:"id"`
-	Estado          int            `db:"estado"`
-	HoraEstimadaFin time.Time      `db:"hora_estimada_fin"`
-	DetalleEnvio    sql.NullString `db:"detalle_envio"`
-	TipoEnvio       int            `db:"tipo_envio"`
-	Total           float64        `db:"total"`
-	IDDomicicio     int            `db:"id_domicilio"`
-	IDCliente       int            `db:"id_cliente"`
+	ID              int             `db:"id"`
+	Estado          sql.NullInt32   `db:"estado"`
+	HoraEstimadaFin sql.NullTime    `db:"hora_estimada_fin"`
+	DetalleEnvio    sql.NullString  `db:"detalle_envio"`
+	TipoEnvio       sql.NullInt32   `db:"tipo_envio"`
+	Total           sql.NullFloat64 `db:"total"`
+	IDDomicicio     sql.NullInt32   `db:"id_domicilio"`
+	IDCliente       sql.NullInt32   `db:"id_cliente"`
 }
 
 func (i *pedidoDB) toPedido() domain.Pedido {
 	return domain.Pedido{
 		ID:              i.ID,
-		Estado:          i.Estado,
-		HoraEstimadaFin: i.HoraEstimadaFin,
+		Estado:          database.ToIntP(i.Estado),
+		HoraEstimadaFin: *database.ToTimeP(i.HoraEstimadaFin),
 		DetalleEnvio:    database.ToStringP(i.DetalleEnvio),
-		TipoEnvio:       i.TipoEnvio,
-		Total:           i.Total,
-		IDDomicicio:     i.IDDomicicio,
-		IDCliente:       i.IDCliente,
+		TipoEnvio:       database.ToIntP(i.TipoEnvio),
+		Total:           database.ToFloat64P(i.Total),
+		IDDomicicio:     database.ToIntP(i.IDDomicicio),
+		IDCliente:       database.ToIntP(i.IDCliente),
 	}
 }
 

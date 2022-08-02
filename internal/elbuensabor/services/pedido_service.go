@@ -133,7 +133,7 @@ func (s *PedidoService) UpdateEstadoPedido(ctx context.Context, estado, IDPedido
 			factura := domain.Factura{
 				MontoDescuento: &descuento,
 				FormaPago:      pedido.DetalleEnvio,
-				TotalVenta:     &pedido.Total,
+				TotalVenta:     pedido.Total,
 				TotalCosto:     &costo_total,
 				IDPedido:       &IDPedido,
 			}
@@ -191,7 +191,7 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		if err != nil {
 			return err
 		}
-		if pedido.TipoEnvio == domain.ENVIO_DELIVERY {
+		if *pedido.TipoEnvio == domain.ENVIO_DELIVERY {
 			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros) + 10
 		} else {
 			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros)
@@ -209,7 +209,7 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		if len(detallePedido) > 0 {
 			for _, detalle := range detallePedido {
 				detalle.IDPedido = idPedido
-				if pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
+				if *pedido.TipoEnvio == domain.ENVIO_RETIRO_LOCAL {
 					detalle.SubTotal = detalle.SubTotal * 0.9
 					totalFloat += detalle.SubTotal * float64(detalle.Cantidad)
 				} else {
@@ -244,11 +244,11 @@ func (s *PedidoService) AceptarPedido(ctx context.Context, idPedido int) (bool, 
 			return errors.New("internal server error")
 		}
 		// comprueba que el estado del pedido sea 1 :: 'pendiente de aprobacion'
-		if pedido.Estado != domain.PENDIENTE_APROBACION {
+		if *pedido.Estado != domain.PENDIENTE_APROBACION {
 			return errors.New("solo se puede aceptar pedidos en estado 'pendiente de aprobacion' :: 1 ")
 		}
 
-		ok, err = s.repository.DescontarStock(ctx, tx, idPedido, pedido.Estado)
+		ok, err = s.repository.DescontarStock(ctx, tx, idPedido, *pedido.Estado)
 		if err != nil || !ok {
 			return err
 		}

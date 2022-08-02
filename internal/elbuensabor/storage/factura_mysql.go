@@ -222,7 +222,6 @@ func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx,
 		return nil, err
 	}
 	defer rows.Close()
-	fmt.Println("22222")
 
 	for rows.Next() {
 		var pedido pedidosResponseDB
@@ -244,7 +243,6 @@ func (i *MySQLFacturaRepository) GetByIDPedido(ctx context.Context, tx *sqlx.Tx,
 		return nil, err
 	}
 	defer rows.Close()
-	fmt.Println("333333")
 
 	for rows.Next() {
 		var pedido pedidosResponseDB

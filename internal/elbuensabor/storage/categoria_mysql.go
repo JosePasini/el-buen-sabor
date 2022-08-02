@@ -11,14 +11,16 @@ import (
 )
 
 type categoriaDB struct {
-	ID     int            `json:"id" db:"id"`
-	Nombre sql.NullString `json:"nombre" db:"nombre"`
+	ID       int            `json:"id" db:"id"`
+	Nombre   sql.NullString `json:"nombre" db:"nombre"`
+	EsInsumo sql.NullBool   `json:"es_insumo" db:"es_insumo"`
 }
 
 func (a *categoriaDB) toCategoria() domain.Categoria {
 	return domain.Categoria{
-		ID:     a.ID,
-		Nombre: database.ToStringP(a.Nombre),
+		ID:       a.ID,
+		Nombre:   database.ToStringP(a.Nombre),
+		EsInsumo: database.ToBoolP(a.EsInsumo),
 	}
 }
 
@@ -34,15 +36,15 @@ type MySQLCategoriaRepository struct {
 
 func NewMySQLCategoriaRepository() *MySQLCategoriaRepository {
 	return &MySQLCategoriaRepository{
-		qInsert: "INSERT INTO categoria (nombre) VALUES (?)",
-		qGetAll: "SELECT id, nombre FROM categoria",
+		qInsert: "INSERT INTO categoria (nombre, es_insumo) VALUES (?,?)",
+		qGetAll: "SELECT id, nombre, es_insumo FROM categoria",
 	}
 }
 
 func (i *MySQLCategoriaRepository) Insert(ctx context.Context, tx *sqlx.Tx, categoria domain.Categoria) error {
 	fmt.Println("domicilio:", categoria)
 	query := i.qInsert
-	_, err := tx.ExecContext(ctx, query, categoria.Nombre)
+	_, err := tx.ExecContext(ctx, query, categoria.Nombre, categoria.EsInsumo)
 	return err
 }
 

@@ -18,11 +18,11 @@ const (
 
 type Pedido struct {
 	ID              int       `json:"id"`
-	Estado          int       `json:"estado"`
+	Estado          *int      `json:"estado"`
 	HoraEstimadaFin time.Time `json:"hora_estimada_fin"`
 	DetalleEnvio    *string   `json:"detalle_envio"`
-	TipoEnvio       int       `json:"tipo_envio"`
-	Total           float64   `json:"total"`
-	IDDomicicio     int       `json:"id_domicilio"`
-	IDCliente       int       `json:"id_cliente"`
+	TipoEnvio       *int      `json:"tipo_envio"`
+	Total           *float64  `json:"total"`
+	IDDomicicio     *int      `json:"id_domicilio"`
+	IDCliente       *int      `json:"id_cliente"`
 }
