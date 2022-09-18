@@ -191,11 +191,11 @@ func (s *PedidoService) GenerarPedido(ctx context.Context, generarPedido domain.
 		if err != nil {
 			return err
 		}
-		if *pedido.TipoEnvio == domain.ENVIO_DELIVERY {
-			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros) + 10
-		} else {
-			tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros)
-		}
+		// if *pedido.TipoEnvio == domain.ENVIO_DELIVERY {
+		// 	tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros) + 10
+		// } else {
+		// 	tiempoTotalEstimado = (tiempoCocinaAcum / cantidadDeCocineros)
+		// }
 		fmt.Println("cantidadDeCocineros service", cantidadDeCocineros)
 		fmt.Println("tiempoCocinaAcum:", tiempoCocinaAcum)
 		fmt.Println("tiempoTotalEstimado:", tiempoTotalEstimado)
