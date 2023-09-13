@@ -9,15 +9,15 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type loginDB struct {
-	ID       int            `db:"id"`
-	Nombre   sql.NullString `db:"nombre"`
-	Apellido sql.NullString `db:"apellido"`
-	Email    sql.NullString `db:"email"`
-	Usuario  sql.NullString `db:"usuario"`
-	Hash     sql.NullString `db:"hash"`
-	Rol      int            `db:"rol"`
-}
+// type loginDB struct {
+// 	ID       int            `db:"id"`
+// 	Nombre   sql.NullString `db:"nombre"`
+// 	Apellido sql.NullString `db:"apellido"`
+// 	Email    sql.NullString `db:"email"`
+// 	Usuario  sql.NullString `db:"usuario"`
+// 	Hash     sql.NullString `db:"hash"`
+// 	Rol      int            `db:"rol"`
+// }
 
 type loginResponseDB struct {
 	ID       int            `db:"id"`
@@ -39,17 +39,17 @@ func (i *loginResponseDB) toLoginResponseDB() domain.UsuarioResponse {
 	}
 }
 
-func (i *loginDB) toLoginDB() domain.Usuario {
-	return domain.Usuario{
-		ID:       i.ID,
-		Nombre:   database.ToStringP(i.Nombre),
-		Apellido: database.ToStringP(i.Apellido),
-		Email:    database.ToStringP(i.Email),
-		Usuario:  database.ToStringP(i.Usuario),
-		Hash:     database.ToStringP(i.Hash),
-		Rol:      i.Rol,
-	}
-}
+// func (i *loginDB) toLoginDB() domain.Usuario {
+// 	return domain.Usuario{
+// 		ID:       i.ID,
+// 		Nombre:   database.ToStringP(i.Nombre),
+// 		Apellido: database.ToStringP(i.Apellido),
+// 		Email:    database.ToStringP(i.Email),
+// 		Usuario:  database.ToStringP(i.Usuario),
+// 		Hash:     database.ToStringP(i.Hash),
+// 		Rol:      i.Rol,
+// 	}
+// }
 
 type MySQLLoginRepository struct {
 	qInsert     string

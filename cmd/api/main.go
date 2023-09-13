@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-
+	// fdsa
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -18,7 +18,9 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
-	router.SetTrustedProxies([]string{"192.168.1.2"})
+	if err := router.SetTrustedProxies([]string{"192.168.1.2"}); err != nil {
+		fmt.Println("Error al setear los proxies.")
+	}
 	fmt.Println("Iniciando la app...")
 	server, err := app.NewApp()
 	server.RegisterRoutes(router)
@@ -27,5 +29,9 @@ func main() {
 		server.CerrarDB()
 		return
 	}
-	router.Run(":" + port)
+	if err := router.Run(":" + port); err != nil {
+		fmt.Println("Error al iniciar el servidor.")
+		server.CerrarDB()
+		return
+	}
 }

@@ -33,10 +33,6 @@ type Usuario struct {
 	Rol      int     `json:"rol"`
 }
 
-func (u Usuario) isValid() bool {
-	return u.ID > 0
-}
-
 func (u Usuario) GeneratePassword(userPassword string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(userPassword), bcrypt.DefaultCost)
 }

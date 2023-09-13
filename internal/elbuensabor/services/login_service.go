@@ -47,7 +47,7 @@ func (s *LoginService) AddUsuario(ctx context.Context, usuario domain.Usuario) e
 }
 
 func (s *LoginService) LoginUsuario(ctx context.Context, usuario domain.Login) (bool, error) {
-	var bool = false
+	var flag bool
 	var hashEmailDB string
 	var err error
 	err = s.db.WithTransaction(ctx, func(tx *sqlx.Tx) error {
@@ -55,8 +55,8 @@ func (s *LoginService) LoginUsuario(ctx context.Context, usuario domain.Login) (
 		return err
 	})
 	fmt.Println("Hash User Email:", hashEmailDB)
-	bool, err = domain.ValidatePassword(usuario.Hash, hashEmailDB)
-	return bool, nil
+	flag, err = domain.ValidatePassword(usuario.Hash, hashEmailDB)
+	return flag, nil
 }
 func (s *LoginService) GetAllUsuarios(ctx context.Context) ([]domain.UsuarioResponse, error) {
 	var listaUsuarios []domain.UsuarioResponse

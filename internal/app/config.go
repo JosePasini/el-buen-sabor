@@ -13,7 +13,9 @@ import (
 // NewConfig :: Carga de configuración inicial
 func NewConfig(scope string) (elbuensabor.AppConfig, error) {
 
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		fmt.Println("No se pudo cargar el archivo .env")
+	}
 
 	USER_ENV := os.Getenv("DB_USERNAME")
 	PASS_ENV := os.Getenv("DB_PASS")

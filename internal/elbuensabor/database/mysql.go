@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//MySQLConfig :: Struct configuración de MySQL
+// MySQLConfig :: Struct configuración de MySQL
 type MySQLConfig struct {
 	User     string
 	Password string
@@ -33,7 +33,7 @@ func NewMySQL(config MySQLConfig) (*MySQL, error) {
 	fmt.Println("[event:Connect] connecting to mysql DB...")
 	db, err := sqlx.Open("mysql", config.GetConnectionString())
 	if err != nil {
-		fmt.Println("[event: fail_db_init][service: db_service] Could not start DB connection %s", err, err.Error())
+		fmt.Printf("[event: fail_db_init][service: db_service] Could not start DB connection %s, %s", err, err.Error())
 		return nil, err
 	}
 	if err := mysql.SetLogger(log.New(os.Stderr, "mysql ", log.Ldate|log.Ltime|log.LUTC|log.Llongfile)); err != nil {
@@ -64,7 +64,7 @@ func (db MySQL) WithTransaction(ctx context.Context, f func(*sqlx.Tx) error) (er
 	return err
 }
 
-//Close :: Close db conn
+// Close :: Close db conn
 func (db MySQL) Close() error {
 	return db.DB.Close()
 }
