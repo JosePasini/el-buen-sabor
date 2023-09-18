@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	// fdsa
+	// comienza el método main y levanta la aplicación
 	port := os.Getenv("PORT")
 
 	if port == "" {
