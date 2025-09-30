@@ -6,6 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// repository
 type IInstrumentoRepository interface {
 	Insert(ctx context.Context, tx *sqlx.Tx, instrumento Instrumento) error
 	GetByID(ctx context.Context, tx *sqlx.Tx, id int) (*Instrumento, error)
